@@ -20,10 +20,6 @@ public class Ingredient {
     @Column
     private String name;
 
-    @ManyToMany
-    @JoinTable(
-            name = "ingredient_contain",
-            joinColumns = @JoinColumn(name = "ingredient_id"),
-            inverseJoinColumns = @JoinColumn(name = "recipe_id"))
+    @ManyToMany(mappedBy = "ingredientSet")
     Set<Recipe> recipeSet;
 }

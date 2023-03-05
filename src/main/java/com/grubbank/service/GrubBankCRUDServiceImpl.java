@@ -28,7 +28,8 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
 
     @Override
     public List<Recipe> getAllRecipes() {
-        return (List<Recipe>) grubBankRepository.findAll();
+        List<Recipe> recipeList = (List<Recipe>) grubBankRepository.findAll();
+        return recipeList;
     }
 
     /**
@@ -62,8 +63,8 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
             if (!recipe.getName().isEmpty()) {
                 recipeInDB.setName(recipe.getName());
             }
-            if (recipe.getIngredients() != null && !recipe.getIngredients().isEmpty()) {
-                recipeInDB.setIngredients(recipe.getIngredients());
+            if (recipe.getIngredientSet() != null && !recipe.getIngredientSet().isEmpty()) {
+                recipeInDB.setIngredientSet(recipe.getIngredientSet());
             }
 
             recipeInDB.setNumberOfServings(recipe.getNumberOfServings());

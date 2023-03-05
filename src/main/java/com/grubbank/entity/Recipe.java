@@ -29,8 +29,13 @@ public class Recipe {
     @Column
     private String instructions;
 
-    @ManyToMany(mappedBy = "recipeSet")
-    private Set<Ingredient> ingredients;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "ingredient_contain",
+            joinColumns = @JoinColumn(name = "recipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
+    private Set<Ingredient> ingredientSet;
 
     private Duration preparationTime;
     private Duration totalTime;
