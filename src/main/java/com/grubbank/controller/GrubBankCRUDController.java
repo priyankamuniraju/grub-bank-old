@@ -1,8 +1,12 @@
 package com.grubbank.controller;
 
 import com.grubbank.entity.Recipe;
+import com.grubbank.exception.RecipeNotFoundException;
+import com.grubbank.response.ResponseHandler;
 import com.grubbank.service.GrubBankCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -28,8 +32,14 @@ public class GrubBankCRUDController {
      */
     @GetMapping(path = "/getRecipeList")
     @ResponseBody
-    Collection<Recipe> getRecipeList() {
-        return grubBankCRUDService.getAllRecipes();
+    ResponseEntity<Object> getRecipeList() {
+        try{
+            List<Recipe> recipeList = grubBankCRUDService.getAllRecipes();
+            return ResponseHandler.generateResponse("Successfully fetched the recipes !!",HttpStatus.OK,recipeList);
+        }catch(RecipeNotFoundException recipeNotFoundException){
+            return ResponseHandler.generateResponse("Failed to fetch the recipes !!",HttpStatus.OK,null);
+        }
+
     }
 
     /**
@@ -38,8 +48,14 @@ public class GrubBankCRUDController {
      */
     @GetMapping("/getRecipeByName/{recipeByName}")
     @ResponseBody
-    List<Recipe> getRecipeById(@PathVariable String recipeByName) {
-        return grubBankCRUDService.getRecipeByName(recipeByName);
+    ResponseEntity<Object> getRecipeByName(@PathVariable String recipeByName) {
+        try{
+            List<Recipe> recipeList = grubBankCRUDService.getRecipeByName(recipeByName);
+            return ResponseHandler.generateResponse("Successfully fetched the recipe !!", HttpStatus.OK,recipeList);
+
+        }catch (RecipeNotFoundException recipeNotFoundException){
+            return ResponseHandler.generateResponse("Failed to fetch the recipe !!", HttpStatus.CONFLICT,null);
+        }
     }
 
     /**
@@ -58,9 +74,13 @@ public class GrubBankCRUDController {
      * @return the success message after deleting recipe based on the requested id
      */
     @DeleteMapping(path = "/deleteRecipeById/{id}")
-    String deleteRecipeById(@PathVariable int id) {
-        grubBankCRUDService.deleteRecipeById(id);
-        return "Recipe with id : " + id + " deleted successfully";
+    ResponseEntity<Object> deleteRecipeById(@PathVariable int id) {
+        try{
+            grubBankCRUDService.deleteRecipeById(id);
+            return ResponseHandler.generateResponse("Successfully deleted the recipe !!",HttpStatus.OK,null);
+        }catch(RecipeNotFoundException recipeNotFoundException){
+            return ResponseHandler.generateResponse("Failed to delete the recipe !!",HttpStatus.CONFLICT,null);
+        }
     }
 
     /**
