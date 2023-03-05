@@ -11,6 +11,4 @@ public interface GrubBankRepository extends CrudRepository<Recipe, Integer> {
     @Query("SELECT r FROM Recipe r WHERE r.name LIKE CONCAT('%',:name, '%')")
     List<Recipe> searchRecipesByName(String name);
 
-//    List<Recipe> searchRecipeBasedOnCriteria(RecipeSearchCriteria recipeSearchCriteria);
-
 }

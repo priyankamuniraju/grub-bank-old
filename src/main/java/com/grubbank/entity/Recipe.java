@@ -1,9 +1,14 @@
 package com.grubbank.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -15,7 +20,6 @@ import java.util.Set;
 public class Recipe {
 
     @Id
-    @Column
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
@@ -30,12 +34,12 @@ public class Recipe {
     private String instructions;
 
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "ingredient_contain",
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
-    private Set<Ingredient> ingredientSet;
+    private List<Ingredient> ingredientSet;
 
     private Duration preparationTime;
     private Duration totalTime;

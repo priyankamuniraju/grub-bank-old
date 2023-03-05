@@ -18,8 +18,8 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
      * @param recipe the recipe that needs to be saved in the db
      */
     @Override
-    public void saveRecipe(Recipe recipe) {
-        grubBankRepository.save(recipe);
+    public Recipe saveRecipe(Recipe recipe) {
+        return grubBankRepository.save(recipe);
     }
 
     /**

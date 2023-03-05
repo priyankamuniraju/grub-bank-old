@@ -3,12 +3,13 @@ package com.grubbank.service;
 import com.grubbank.entity.Recipe;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GrubBankCRUDService {
     /**
      * @param recipe the recipe that needs to be saved in the db
      */
-    void saveRecipe(Recipe recipe);
+    Recipe saveRecipe(Recipe recipe);
 
     /**
      * @return the list of all the recipes in the grubbank db

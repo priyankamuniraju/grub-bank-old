@@ -1,11 +1,13 @@
 package com.grubbank.entity;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,6 +22,7 @@ public class Ingredient {
     @Column
     private String name;
 
-    @ManyToMany(mappedBy = "ingredientSet")
-    Set<Recipe> recipeSet;
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "ingredientSet")
+    @JsonIgnore
+    List<Recipe> recipeSet;
 }

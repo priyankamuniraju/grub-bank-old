@@ -19,8 +19,8 @@ public class GrubBankCRUDController {
      * @param recipe the new recipe that needs to be added
      */
     @PostMapping(path = "/addRecipe")
-    public void addRecipe(@RequestBody Recipe recipe) {
-        grubBankCRUDService.saveRecipe(recipe);
+    public Recipe addRecipe(@RequestBody Recipe recipe) {
+        return grubBankCRUDService.saveRecipe(recipe);
     }
 
     /**
@@ -39,8 +39,7 @@ public class GrubBankCRUDController {
     @GetMapping("/getRecipeByName/{recipeByName}")
     @ResponseBody
     List<Recipe> getRecipeById(@PathVariable String recipeByName) {
-        List<Recipe> recipeList = grubBankCRUDService.getRecipeByName(recipeByName);
-        return recipeList;
+        return grubBankCRUDService.getRecipeByName(recipeByName);
     }
 
     /**

@@ -1,17 +1,24 @@
 package com.grubbank.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class NutritionalValue {
 
     @Id
@@ -45,6 +52,11 @@ public class NutritionalValue {
             @AttributeOverride(name = "unit", column = @Column(name = "protein_unit"))
     })
     private Nutrient proteins;
+
+    @OneToMany
+    @JsonIgnore
+    @JoinColumn(name = "recipe_id")
+    Set<Recipe> recipeSet;
 
     @Data
     @Builder
