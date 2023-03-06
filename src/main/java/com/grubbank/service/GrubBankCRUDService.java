@@ -9,7 +9,7 @@ public interface GrubBankCRUDService {
     /**
      * @param recipe the recipe that needs to be saved in the db
      */
-    Recipe saveRecipe(Recipe recipe);
+    Recipe saveRecipe(Recipe recipe) throws RecipeValidator.InvalidRecipeException;
 
     /**
      * @return the list of all the recipes in the grubbank db
@@ -27,7 +27,7 @@ public interface GrubBankCRUDService {
      * @param recipeId the recipe id of the recipe that needs to be updated
      * @return the updated recipe
      */
-    Recipe updateRecipe(Recipe recipe, int recipeId);
+    Recipe updateRecipe(Recipe recipe, int recipeId) throws RecipeValidator.InvalidRecipeException;
 
     /**
      * @param recipeId the recipe id that needs to be deleted

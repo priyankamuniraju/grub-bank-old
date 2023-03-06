@@ -26,7 +26,6 @@ public class Recipe {
     @Column
     private int numberOfServings;
 
-    @NonNull
     @Column
     private String name;
 
@@ -41,7 +40,10 @@ public class Recipe {
             inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
     private List<Ingredient> ingredientSet;
 
+    @Column
     private Duration preparationTime;
+
+    @Column
     private Duration totalTime;
 
     @ManyToOne(cascade = CascadeType.ALL)
