@@ -12,6 +12,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
+/*
+ The Search criteria for searching {@link Recipe} in the datastore
+ Currently it supports search by doing an AND query with each of the supplied params
+ If the param type is a list/set, such as {@link RecipeSearchCriteria#ingredientIncludeSet},
+ then an in/not in is applied based on the parameter.
+*/
 public class RecipeSearchCriteria {
   private int numberOfServings;
   private Set<Recipe.RecipeType> recipeTypeSet;
