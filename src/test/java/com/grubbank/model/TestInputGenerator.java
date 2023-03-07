@@ -16,14 +16,14 @@ public class TestInputGenerator {
     Recipe recipe = new Recipe();
     recipe.setId(1);
     recipe.setName("Kheer");
-////    recipe.setIngredientSet(ingredientList);
+    ////    recipe.setIngredientSet(ingredientList);
     recipe.setNumberOfServings(4);
-//    recipe.setRecipeType(Recipe.RecipeType.VEGETARIAN);
-//    //        recipe.setPreparationTime.;
-//    recipe.setInstructions(
-//        "Boil milk in a bowl, fry semolina in a pan, "
-//            + "add the fried semolina to the boiling milk, add sugar");
-//    recipe.setNutritionalValue(createNutritionalValue());
+    //    recipe.setRecipeType(Recipe.RecipeType.VEGETARIAN);
+    //    //        recipe.setPreparationTime.;
+    //    recipe.setInstructions(
+    //        "Boil milk in a bowl, fry semolina in a pan, "
+    //            + "add the fried semolina to the boiling milk, add sugar");
+    //    recipe.setNutritionalValue(createNutritionalValue());
     return recipe;
   }
 

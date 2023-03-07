@@ -25,42 +25,37 @@ public class GrubBankCRUDController {
   private static final String RECIPE_FETCH_SUCCESS = "Successfully fetched the recipe(s) !!";
   private static final String NO_RECIPES_FOUND = "No recipes found!";
 
-  @Autowired
-  private GrubBankCRUDService grubBankCRUDService;
+  @Autowired private GrubBankCRUDService grubBankCRUDService;
 
-  /**
-   * @param recipe the new recipe that needs to be added
-   */
+  /** @param recipe the new recipe that needs to be added */
   @PostMapping("/addRecipe")
   public ResponseEntity<GrubResponseBody<? extends Streamable>> addRecipe(
-          @RequestBody Recipe recipe) {
+      @RequestBody Recipe recipe) {
     try {
       return new ResponseEntity<>(
-              new GrubResponseBody<>(RECIPE_ADD_SUCCESS, grubBankCRUDService.saveRecipe(recipe)),
-              HttpStatus.OK);
+          new GrubResponseBody<>(RECIPE_ADD_SUCCESS, grubBankCRUDService.saveRecipe(recipe)),
+          HttpStatus.OK);
     } catch (RecipeValidator.InvalidRecipeException invalidRecipeException) {
       return new ResponseEntity<>(
-              new GrubResponseBody<>(
-                      String.format(RECIPE_ADD_FAILED, invalidRecipeException.getMessage()),
-                      ErrorPayload.builder()
-                              .detail(invalidRecipeException.getDetail())
-                              .exception(invalidRecipeException)
-                              .build()),
-              HttpStatus.BAD_REQUEST);
+          new GrubResponseBody<>(
+              String.format(RECIPE_ADD_FAILED, invalidRecipeException.getMessage()),
+              ErrorPayload.builder()
+                  .detail(invalidRecipeException.getDetail())
+                  .exception(invalidRecipeException)
+                  .build()),
+          HttpStatus.BAD_REQUEST);
     }
   }
 
-  /**
-   * @return the list of all the recipes in the grubbank
-   */
+  /** @return the list of all the recipes in the grubbank */
   @GetMapping("/getRecipeList")
   @ResponseBody
   ResponseEntity<GrubResponseBody<List<Recipe>>> getRecipeList() {
     List<Recipe> recipeList = grubBankCRUDService.getAllRecipes();
     return new ResponseEntity<>(
-            new GrubResponseBody<>(
-                    recipeList.size() > 0 ? RECIPE_FETCH_SUCCESS : NO_RECIPES_FOUND, recipeList),
-            HttpStatus.OK);
+        new GrubResponseBody<>(
+            recipeList.size() > 0 ? RECIPE_FETCH_SUCCESS : NO_RECIPES_FOUND, recipeList),
+        HttpStatus.OK);
   }
 
   /**
@@ -70,39 +65,39 @@ public class GrubBankCRUDController {
   @GetMapping("/getRecipeByName/{recipeByName}")
   @ResponseBody
   ResponseEntity<GrubResponseBody<List<Recipe>>> getRecipeByName(
-          @PathVariable String recipeByName) {
+      @PathVariable String recipeByName) {
     List<Recipe> recipeList = grubBankCRUDService.getRecipeByName(recipeByName);
     return new ResponseEntity<>(
-            new GrubResponseBody<>(
-                    recipeList.size() > 0 ? RECIPE_FETCH_SUCCESS : NO_RECIPES_FOUND, recipeList),
-            HttpStatus.OK);
+        new GrubResponseBody<>(
+            recipeList.size() > 0 ? RECIPE_FETCH_SUCCESS : NO_RECIPES_FOUND, recipeList),
+        HttpStatus.OK);
   }
 
   /**
    * @param recipeId the recipe id of the recipe that needs to be updated
-   * @param recipe   the updated recipe
+   * @param recipe the updated recipe
    * @return the updated recipe
    */
   @PutMapping("/updateRecipeById/{recipeId}")
   @ResponseBody
   ResponseEntity<GrubResponseBody<Recipe>> updateRecipeById(
-          @PathVariable int recipeId, @RequestBody Recipe recipe) {
+      @PathVariable int recipeId, @RequestBody Recipe recipe) {
     try {
       return new ResponseEntity<>(
-              new GrubResponseBody<>(
-                      String.format("Successfully updated the recipe with recipe id : %s", recipeId),
-                      grubBankCRUDService.updateRecipe(recipe, recipeId)),
-              HttpStatus.OK);
+          new GrubResponseBody<>(
+              String.format("Successfully updated the recipe with recipe id : %s", recipeId),
+              grubBankCRUDService.updateRecipe(recipe, recipeId)),
+          HttpStatus.OK);
     } catch (RecipeNotFoundException
-            | RecipeValidator.InvalidRecipeException
-            | JsonProcessingException exception) {
+        | RecipeValidator.InvalidRecipeException
+        | JsonProcessingException exception) {
       return new ResponseEntity<>(
-              new GrubResponseBody<>(
-                      String.format(
-                              "Failed to update the recipe with recipe id : %s, exception %s",
-                              recipeId, exception.getMessage()),
-                      null),
-              HttpStatus.BAD_REQUEST);
+          new GrubResponseBody<>(
+              String.format(
+                  "Failed to update the recipe with recipe id : %s, exception %s",
+                  recipeId, exception.getMessage()),
+              null),
+          HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -115,41 +110,41 @@ public class GrubBankCRUDController {
     try {
       grubBankCRUDService.deleteRecipeById(recipeId);
       return new ResponseEntity<>(
-              new GrubResponseBody<>(
-                      String.format("Successfully deleted the recipe with recipeId!! : %s", recipeId),
-                      null),
-              HttpStatus.OK);
+          new GrubResponseBody<>(
+              String.format("Successfully deleted the recipe with recipeId!! : %s", recipeId),
+              null),
+          HttpStatus.OK);
     } catch (RecipeNotFoundException recipeNotFoundException) {
       return new ResponseEntity<>(
-              new GrubResponseBody<>(
-                      String.format(
-                              "Failed to delete the recipe with recipeId!! : %s, exception %s ",
-                              recipeId, recipeNotFoundException.getMessage()),
-                      null),
-              HttpStatus.OK);
+          new GrubResponseBody<>(
+              String.format(
+                  "Failed to delete the recipe with recipeId!! : %s, exception %s ",
+                  recipeId, recipeNotFoundException.getMessage()),
+              null),
+          HttpStatus.OK);
     }
   }
 
   @PostMapping("/search")
   ResponseEntity<GrubResponseBody<Object>> searchByCriteria(
-          @RequestBody RecipeSearchCriteria recipeSearchCriteria) {
+      @RequestBody RecipeSearchCriteria recipeSearchCriteria) {
     try {
       List<Recipe> recipeList = grubBankCRUDService.searchByCriteria(recipeSearchCriteria);
       return new ResponseEntity<>(
-              new GrubResponseBody<>(
-                      recipeList.size() > 0 ? RECIPE_FETCH_SUCCESS : NO_RECIPES_FOUND, recipeList),
-              HttpStatus.OK);
+          new GrubResponseBody<>(
+              recipeList.size() > 0 ? RECIPE_FETCH_SUCCESS : NO_RECIPES_FOUND, recipeList),
+          HttpStatus.OK);
     } catch (
-            RecipeSearchCriteriaValidator.InvalidRecipeSearchCriteriaException
-                    invalidRecipeSearchCriteriaException) {
+        RecipeSearchCriteriaValidator.InvalidRecipeSearchCriteriaException
+            invalidRecipeSearchCriteriaException) {
       return new ResponseEntity<>(
-              new GrubResponseBody<>(
-                      String.format(RECIPE_ADD_FAILED, invalidRecipeSearchCriteriaException.getMessage()),
-                      ErrorPayload.builder()
-                              .detail(invalidRecipeSearchCriteriaException.getDetail())
-                              .exception(invalidRecipeSearchCriteriaException)
-                              .build()),
-              HttpStatus.BAD_REQUEST);
+          new GrubResponseBody<>(
+              String.format(RECIPE_ADD_FAILED, invalidRecipeSearchCriteriaException.getMessage()),
+              ErrorPayload.builder()
+                  .detail(invalidRecipeSearchCriteriaException.getDetail())
+                  .exception(invalidRecipeSearchCriteriaException)
+                  .build()),
+          HttpStatus.BAD_REQUEST);
     }
   }
 }

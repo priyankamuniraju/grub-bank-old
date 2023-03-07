@@ -23,11 +23,32 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
   @Autowired private RecipeRepository recipeRepository;
   @Autowired private IngredientRepository ingredientRepository;
   @Autowired private NutritionalValueRepository nutritionalValueRepository;
-
   @Autowired private RecipeValidator recipeValidator;
-
   @Autowired private ObjectMapper objectMapper;
 
+  /**
+   * This particular implementation saves the corresponding relationships and then saves the parent.
+   * In this case the {@link com.grubbank.entity.Ingredient} and {@link
+   * com.grubbank.entity.NutritionalValue} are the referenced entities, for better management and to
+   * reduce duplicates in the datastore (typically RDBMS sql DBs), we would save the relationships
+   * first. In this way if there is already an Ingredient (id) and NutritionalValue (id) present in
+   * the datastore, we don't have to recreate them, generally Cascade ALL, PERSIST would try to
+   * recreate these records, leading to duplicated data. Either the update or create will fail to
+   * with these cascade types if we want to avoid duplicates. So it is better to manage the
+   * referenced entities separately. Hence, in this case we save the {@link
+   * com.grubbank.entity.Ingredient} and {@link com.grubbank.entity.NutritionalValue} first, if no
+   * id is passed in the input these are created, and if an id is passed these are updated/not
+   * updated, without creating new duplicate entry in the database. Typically, when the clients
+   * choose a referenced entity, such as {@link com.grubbank.entity.Ingredient} or {@link
+   * com.grubbank.entity.NutritionalValue} they would either have a list of these to choose from, in
+   * which case the corresponding id cane be safely passed, or they would create a new one. In this
+   * either case the following API implementation would work.
+   *
+   * @param recipe The {@link Recipe} to be saved
+   * @return Saved {@link Recipe}
+   * @throws RecipeValidator.InvalidRecipeException when the passed {@link Recipe} doesn't meet the
+   *     required validations see {@link RecipeValidator}
+   */
   @Override
   @Transactional
   public Recipe saveRecipe(Recipe recipe) throws RecipeValidator.InvalidRecipeException {
@@ -47,6 +68,10 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
     return recipeRepository.searchRecipesByName(recipeName.toUpperCase());
   }
 
+  /**
+   * In this particular implementation we manage the referenced entities first and then the
+   * referencing entity See {@link GrubBankCRUDServiceImpl#saveRecipe(Recipe)} for details.
+   */
   @Override
   @Transactional
   public Recipe updateRecipe(Recipe recipe, int recipeId)
