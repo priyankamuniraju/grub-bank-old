@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RecipeSearchCriteria {
   private int numberOfServings;
-  private Set<Recipe.RecipeType> recipeTypeEnum;
+  private Set<Recipe.RecipeType> recipeTypeSet;
   private Set<Ingredient> ingredientIncludeSet;
   private Set<Ingredient> ingredientExcludeSet;
   private String instructionContains;

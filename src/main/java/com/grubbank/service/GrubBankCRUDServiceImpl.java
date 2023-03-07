@@ -3,11 +3,14 @@ package com.grubbank.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.grubbank.apimodel.RecipeSearchCriteria;
 import com.grubbank.entity.Recipe;
 import com.grubbank.exception.RecipeNotFoundException;
 import com.grubbank.repository.IngredientRepository;
 import com.grubbank.repository.NutritionalValueRepository;
 import com.grubbank.repository.RecipeRepository;
+import com.grubbank.validator.RecipeSearchCriteriaValidator;
+import com.grubbank.validator.RecipeValidator;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +31,7 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
   @Override
   @Transactional
   public Recipe saveRecipe(Recipe recipe) throws RecipeValidator.InvalidRecipeException {
-    recipeValidator(recipe);
+    recipeValidator.validateRecipe(recipe);
     recipe.getIngredientSet().forEach(ingredient -> ingredientRepository.save(ingredient));
     nutritionalValueRepository.save(recipe.getNutritionalValue());
     return recipeRepository.save(recipe);
@@ -97,7 +100,9 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
     recipeRepository.deleteById(recipeId);
   }
 
-  public void recipeValidator(Recipe recipe) throws RecipeValidator.InvalidRecipeException {
-    recipeValidator.validateRecipe(recipe);
+  @Override
+  public List<Recipe> searchByCriteria(RecipeSearchCriteria recipeSearchCriteria)
+      throws RecipeSearchCriteriaValidator.InvalidRecipeSearchCriteriaException {
+    return recipeRepository.listAllRecipes(recipeSearchCriteria);
   }
 }

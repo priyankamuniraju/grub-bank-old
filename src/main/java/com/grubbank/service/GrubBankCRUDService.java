@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.grubbank.apimodel.RecipeSearchCriteria;
 import com.grubbank.entity.Recipe;
 import com.grubbank.exception.RecipeNotFoundException;
+import com.grubbank.validator.RecipeSearchCriteriaValidator;
+import com.grubbank.validator.RecipeValidator;
 import java.util.List;
 
 public interface GrubBankCRUDService {
 
   /**
-   *
    * @param recipe
    * @return
    * @throws RecipeValidator.InvalidRecipeException
@@ -52,11 +53,10 @@ public interface GrubBankCRUDService {
   /** @param recipeId the recipe id that needs to be deleted */
   void deleteRecipeById(int recipeId) throws RecipeNotFoundException;
 
-  void searchByCriteria(RecipeSearchCriteria recipeSearchCriteria);
-
   /**
-   * @param recipeSearchCriteria the object which holds various search criteria
-   * @return the recipe list based on the requested search criteria
+   * @param recipeSearchCriteria
+   * @return
    */
-  //    List<Recipe> getRecipeBasedOnCriteria(RecipeSearchCriteria recipeSearchCriteria);
+  List<Recipe> searchByCriteria(RecipeSearchCriteria recipeSearchCriteria)
+      throws RecipeSearchCriteriaValidator.InvalidRecipeSearchCriteriaException;
 }

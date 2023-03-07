@@ -8,7 +8,8 @@ import com.grubbank.exception.RecipeNotFoundException;
 import com.grubbank.response.ErrorPayload;
 import com.grubbank.response.GrubResponseBody;
 import com.grubbank.service.GrubBankCRUDService;
-import com.grubbank.service.RecipeValidator;
+import com.grubbank.validator.RecipeSearchCriteriaValidator;
+import com.grubbank.validator.RecipeValidator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -104,7 +105,7 @@ public class GrubBankCRUDController {
    * @param recipeId the recipe with recipeId that needs to be deleted
    * @return the success message after deleting recipe based on the requested id
    */
-  @DeleteMapping("/deleteRecipeById/{id}")
+  @DeleteMapping("/deleteRecipeById/{recipeId}")
   ResponseEntity<GrubResponseBody<Void>> deleteRecipeById(@PathVariable int recipeId) {
     try {
       grubBankCRUDService.deleteRecipeById(recipeId);
@@ -124,9 +125,26 @@ public class GrubBankCRUDController {
     }
   }
 
-
   @PostMapping("/search")
-  ResponseEntity<GrubResponseBody<List<Recipe>>> searchByCriteria(@RequestBody RecipeSearchCriteria recipeSearchCriteria) {
-    grubBankCRUDService.searchByCriteria(recipeSearchCriteria);
+  ResponseEntity<GrubResponseBody<Object>> searchByCriteria(
+      @RequestBody RecipeSearchCriteria recipeSearchCriteria) {
+    try {
+      List<Recipe> recipeList = grubBankCRUDService.searchByCriteria(recipeSearchCriteria);
+      return new ResponseEntity<>(
+          new GrubResponseBody<>(
+              recipeList.size() > 0 ? RECIPE_FETCH_SUCCESS : NO_RECIPES_FOUND, recipeList),
+          HttpStatus.OK);
+    } catch (
+        RecipeSearchCriteriaValidator.InvalidRecipeSearchCriteriaException
+            invalidRecipeSearchCriteriaException) {
+      return new ResponseEntity<>(
+          new GrubResponseBody<>(
+              String.format(RECIPE_ADD_FAILED, invalidRecipeSearchCriteriaException.getMessage()),
+              ErrorPayload.builder()
+                  .detail(invalidRecipeSearchCriteriaException.getDetail())
+                  .exception(invalidRecipeSearchCriteriaException)
+                  .build()),
+          HttpStatus.BAD_REQUEST);
+    }
   }
 }

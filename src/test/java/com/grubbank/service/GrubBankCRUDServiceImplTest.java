@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import com.grubbank.entity.Recipe;
 import com.grubbank.model.TestInputGenerator;
 import com.grubbank.repository.RecipeRepository;
+import com.grubbank.validator.RecipeValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

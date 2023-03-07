@@ -1,4 +1,4 @@
-package com.grubbank.service;
+package com.grubbank.validator;
 
 import com.grubbank.entity.Recipe;
 import lombok.Data;
@@ -12,30 +12,27 @@ public class RecipeValidator {
 
   public void validateRecipe(Recipe recipe) throws InvalidRecipeException {
     if (!StringUtils.hasText(recipe.getInstructions())) {
-      throw new InvalidRecipeException(InvalidField.INSTRUCTIONS, "Instructions cannot be empty");
+      throw new InvalidRecipeException(
+          com.grubbank.validator.InvalidField.INSTRUCTIONS, "Instructions cannot be empty");
     }
     if (recipe.getNumberOfServings() <= 0) {
       throw new InvalidRecipeException(
-          InvalidField.NUMBER_SERVING, "Number of servings should be greater than zero");
+          com.grubbank.validator.InvalidField.NUMBER_SERVING,
+          "Number of servings should be greater than zero");
     }
     if (recipe.getPreparationTime() == null || recipe.getPreparationTime().isNegative()) {
       throw new InvalidRecipeException(
-          InvalidField.PREPARATION_TIME, "Preparation time should be positive");
+          com.grubbank.validator.InvalidField.PREPARATION_TIME,
+          "Preparation time should be positive");
     }
     if (recipe.getIngredientSet() == null || recipe.getIngredientSet().isEmpty()) {
-      throw new InvalidRecipeException(InvalidField.INGREDIENT, "Ingredients cannot be empty");
+      throw new InvalidRecipeException(
+          com.grubbank.validator.InvalidField.INGREDIENT, "Ingredients cannot be empty");
     }
     if (!StringUtils.hasText(recipe.getName())) {
-      throw new InvalidRecipeException(InvalidField.NAME, "Recipe name cannot be empty");
+      throw new InvalidRecipeException(
+          com.grubbank.validator.InvalidField.NAME, "Recipe name cannot be empty");
     }
-  }
-
-  public enum InvalidField {
-    NAME,
-    INGREDIENT,
-    NUMBER_SERVING,
-    PREPARATION_TIME,
-    INSTRUCTIONS
   }
 
   @EqualsAndHashCode(callSuper = true)
