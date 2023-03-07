@@ -48,25 +48,33 @@ public class GrubBankControllerIntegrationTest {
 
   @Autowired ObjectMapper objectMapper;
 
-  @Test
-  public void addRecipeWithValidData_thenStatus200() throws Exception {
-    Recipe input = TestInputGenerator.createValidRecipe();
-
+  private GrubResponseBody<Recipe> saveOrUpdateApiCall(
+      String input, String apiPath, String responseMessage) throws Exception {
     ResultActions resultActions =
         mockMvc
             .perform(
-                MockMvcRequestBuilders.post("/grubbank/addRecipe")
+                MockMvcRequestBuilders.post(apiPath)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(input)))
+                    .content(input))
             .andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.message").value(GrubBankCRUDController.RECIPE_ADD_SUCCESS));
+            .andExpect(jsonPath("$.message").value(responseMessage));
 
     MvcResult result = resultActions.andReturn();
     String responseStr = result.getResponse().getContentAsString();
 
     TypeReference<GrubResponseBody<Recipe>> typeToken = new TypeReference<>() {};
-    GrubResponseBody<Recipe> addedRecipe = objectMapper.readValue(responseStr, typeToken);
+    return objectMapper.readValue(responseStr, typeToken);
+  }
+
+  @Test
+  public void addRecipeWithValidData_thenStatus200() throws Exception {
+    Recipe input = TestInputGenerator.createValidRecipe();
+    GrubResponseBody<Recipe> addedRecipe =
+        saveOrUpdateApiCall(
+            objectMapper.writeValueAsString(input),
+            "/grubbank/addRecipe",
+            GrubBankCRUDController.RECIPE_ADD_SUCCESS);
 
     Assertions.assertEquals(
         input.getNumberOfServings(), addedRecipe.getPayload().getNumberOfServings());
@@ -104,5 +112,73 @@ public class GrubBankControllerIntegrationTest {
         input.getNutritionalValue().getCarbs(), nutritionalValueFromDB.getCarbs());
     Assertions.assertEquals(
         input.getNutritionalValue().getProteins(), nutritionalValueFromDB.getProteins());
+  }
+
+  @Test
+  public void addRecipeWithInvalidData_thenStatus400() throws Exception {
+    Recipe input = TestInputGenerator.createValidRecipe();
+
+    // set the invalid servings so that the request will fail
+    input.setNumberOfServings(-2);
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/grubbank/addRecipe")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(input)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(
+            jsonPath("$.message")
+                .value(
+                    "Failed to save the recipe Invalid input data for the field : NUMBER_SERVING"));
+  }
+
+  @Test
+  public void updateRecipeValidData_thenStatus200() throws Exception {
+
+    // First add the recipe
+    Recipe input = TestInputGenerator.createValidRecipe();
+    GrubResponseBody<Recipe> responseBody =
+        saveOrUpdateApiCall(
+            objectMapper.writeValueAsString(input),
+            "/grubbank/addRecipe",
+            GrubBankCRUDController.RECIPE_ADD_SUCCESS);
+
+    List<Ingredient> inputIngredientList = input.getIngredientSet();
+
+    // assuming the add is successful, grab the id from the add and use it to update.
+    Recipe recipeStored = responseBody.getPayload();
+    int id = recipeStored.getId();
+
+    // use this id to update the recipe
+    // remove an ingredient, change number of servings
+    int newNumberOfServings = recipeStored.getNumberOfServings() + 3;
+    recipeStored.setNumberOfServings(newNumberOfServings);
+    // remove the first ingredient
+    recipeStored.getIngredientSet().remove(0);
+
+    // call update api
+    GrubResponseBody<Recipe> updateResponseBody =
+        saveOrUpdateApiCall(
+            objectMapper.writeValueAsString(recipeStored),
+            "/grubbank/updateRecipeById/" + id,
+            "Successfully updated the recipe with recipe id : " + id);
+
+    Recipe recipeUpdated = updateResponseBody.getPayload();
+    List<Ingredient> updatedIngredientList = recipeUpdated.getIngredientSet();
+    Assertions.assertEquals(id, recipeUpdated.getId());
+    Assertions.assertEquals(newNumberOfServings, recipeUpdated.getNumberOfServings());
+    int expectedIngredientSize = inputIngredientList.size() - 1;
+    Assertions.assertEquals(expectedIngredientSize, updatedIngredientList.size());
+
+    IntStream.range(0, expectedIngredientSize)
+        .forEach(
+            i -> {
+              Assertions.assertEquals(
+                  /*since we removed the first ingredient from original list,
+                  we need to match the i + 1 th entry on original list to
+                  the ith entry in the updated list*/
+                  inputIngredientList.get(i + 1).getName(), updatedIngredientList.get(i).getName());
+            });
   }
 }

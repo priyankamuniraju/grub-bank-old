@@ -78,7 +78,7 @@ public class GrubBankCRUDController {
    * @param recipe the updated recipe
    * @return the updated recipe
    */
-  @PutMapping("/updateRecipeById/{recipeId}")
+  @PostMapping("/updateRecipeById/{recipeId}")
   @ResponseBody
   ResponseEntity<GrubResponseBody<Recipe>> updateRecipeById(
       @PathVariable int recipeId, @RequestBody Recipe recipe) {
