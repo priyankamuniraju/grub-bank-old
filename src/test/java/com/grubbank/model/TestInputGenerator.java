@@ -6,6 +6,8 @@ import static com.grubbank.entity.NutritionalValue.Unit.JOULE;
 import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.NutritionalValue;
 import com.grubbank.entity.Recipe;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,18 +15,32 @@ public class TestInputGenerator {
 
   public static Recipe createValidRecipe() {
     List<Ingredient> ingredientList = createIngredientList();
-    Recipe recipe = new Recipe();
-    recipe.setId(1);
-    recipe.setName("Kheer");
-    ////    recipe.setIngredientSet(ingredientList);
-    recipe.setNumberOfServings(4);
-    //    recipe.setRecipeType(Recipe.RecipeType.VEGETARIAN);
-    //    //        recipe.setPreparationTime.;
-    //    recipe.setInstructions(
-    //        "Boil milk in a bowl, fry semolina in a pan, "
-    //            + "add the fried semolina to the boiling milk, add sugar");
-    //    recipe.setNutritionalValue(createNutritionalValue());
-    return recipe;
+    NutritionalValue nutritionalValue =
+        NutritionalValue.builder()
+            .calories(NutritionalValue.Calorie.builder().value(100).unit(JOULE).build())
+            .carbs(
+                NutritionalValue.Nutrient.builder()
+                    .value(100)
+                    .unit(NutritionalValue.Unit.MG)
+                    .build())
+            .fat(
+                NutritionalValue.Nutrient.builder().value(2).unit(NutritionalValue.Unit.MG).build())
+            .proteins(
+                NutritionalValue.Nutrient.builder()
+                    .value(20)
+                    .unit(NutritionalValue.Unit.MG)
+                    .build())
+            .build();
+    return Recipe.builder()
+        .name("Kheer")
+        .ingredientSet(ingredientList)
+        .recipeType(Recipe.RecipeType.VEGETARIAN)
+        .nutritionalValue(nutritionalValue)
+        .numberOfServings(3)
+        .preparationTime(Duration.of(20, ChronoUnit.MINUTES))
+        .instructions(
+            "Boil milk in a bowl, fry semolina in a pan, add the fried semolina to the boiling milk, add sugar")
+        .build();
   }
 
   public static List<Ingredient> createIngredientList() {
