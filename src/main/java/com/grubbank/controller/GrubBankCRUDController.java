@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/grubbank")
 public class GrubBankCRUDController {
 
-  private static final String RECIPE_ADD_SUCCESS = "Successfully saved the recipe !!";
-  private static final String RECIPE_ADD_FAILED = "Failed to save the recipe %s";
-  private static final String RECIPE_FETCH_SUCCESS = "Successfully fetched the recipe(s) !!";
-  private static final String NO_RECIPES_FOUND = "No recipes found!";
+  public static final String RECIPE_ADD_SUCCESS = "Successfully saved the recipe !!";
+  public static final String RECIPE_ADD_FAILED = "Failed to save the recipe %s";
+  public static final String RECIPE_FETCH_SUCCESS = "Successfully fetched the recipe(s) !!";
+  public static final String NO_RECIPES_FOUND = "No recipes found!";
 
   @Autowired private GrubBankCRUDService grubBankCRUDService;
 
