@@ -11,28 +11,32 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-
-@ExtendWith(MockitoExtension.class)
-@WebMvcTest(GrubBankCRUDController.class)
+@WebMvcTest
+@ContextConfiguration(classes = GrubBankCRUDController.class)
 public class GrubBankCRUDControllerTest {
+
+  private static final Logger logger = LoggerFactory.getLogger(GrubBankCRUDControllerTest.class);
 
   @Autowired MockMvc mockMvc;
 
-  @MockBean GrubBankCRUDService grubBankCRUDService;
+  @MockBean
+  GrubBankCRUDService grubBankCRUDService;
 
   Recipe recipe = TestInputGenerator.createValidRecipe();
   String exampleJSON2 = "{\"payload\":[{\"id\": 1,\"numberOfServings\": 4,\"name\":\"Kheer\"}]}";
@@ -48,14 +52,9 @@ public class GrubBankCRUDControllerTest {
     RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/grubbank/addRecipe").accept(MediaType.APPLICATION_JSON)
             .content(exampleJSON2).contentType(MediaType.APPLICATION_JSON);
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-    System.out.println(result.getResponse());
-
+    logger.info("response {}", result.getResponse());
     MockHttpServletResponse response = result.getResponse();
-
     assertEquals(HttpStatus.OK.value(), response.getStatus());
-
-//    assertEquals("http://localhost/grubbank/addRecipe",
-//            response.getHeader(HttpHeaders.LOCATION));
   }
 
   @Test
