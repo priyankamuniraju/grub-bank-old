@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,7 +25,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@ExtendWith(SpringExtension.class)
+
+@ExtendWith(MockitoExtension.class)
 @WebMvcTest(GrubBankCRUDController.class)
 public class GrubBankCRUDControllerTest {
 
@@ -38,6 +40,23 @@ public class GrubBankCRUDControllerTest {
   @Test
   @DisplayName("Create recipe with invalid input and verify the exception")
   void testCreateRecipeInvalidInput() {}
+
+  @Test
+  @DisplayName("Add recipe - positive case")
+  void testCreateRecipe() throws Exception {
+    Mockito.when(grubBankCRUDService.saveRecipe(any())).thenReturn(recipe);
+    RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/grubbank/addRecipe").accept(MediaType.APPLICATION_JSON)
+            .content(exampleJSON2).contentType(MediaType.APPLICATION_JSON);
+    MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+    System.out.println(result.getResponse());
+
+    MockHttpServletResponse response = result.getResponse();
+
+    assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+//    assertEquals("http://localhost/grubbank/addRecipe",
+//            response.getHeader(HttpHeaders.LOCATION));
+  }
 
   @Test
   @DisplayName("Get all recipes - positive case")
@@ -65,25 +84,5 @@ public class GrubBankCRUDControllerTest {
     System.out.println(result.getResponse());
     String expected = "{\"payload\":[{\"id\": 1,\"numberOfServings\": 4,\"name\":\"Kheer\"}]}";
     JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
-  }
-
-  @Test
-  @DisplayName("Add recipe - positive case")
-  void testCreateRecipe() throws Exception {
-    Mockito.when(grubBankCRUDService.saveRecipe(any())).thenReturn(recipe);
-    RequestBuilder requestBuilder =
-        MockMvcRequestBuilders.post("/grubbank/addRecipe")
-            .accept(MediaType.APPLICATION_JSON)
-            .content(exampleJSON2)
-            .contentType(MediaType.APPLICATION_JSON);
-    MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-    System.out.println(result.getResponse());
-
-    MockHttpServletResponse response = result.getResponse();
-
-    assertEquals(HttpStatus.OK.value(), response.getStatus());
-
-    //    assertEquals("http://localhost/grubbank/addRecipe",
-    //            response.getHeader(HttpHeaders.LOCATION));
   }
 }
