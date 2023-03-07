@@ -8,8 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("com.grubbank")
 public class GrubbankApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(GrubbankApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(GrubbankApplication.class, args);
+  }
 }
