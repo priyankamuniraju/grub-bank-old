@@ -52,7 +52,7 @@ public interface GrubBankCRUDService {
 
   /** @param recipeId the recipe id that needs to be deleted */
   void deleteRecipeById(int recipeId) throws RecipeNotFoundException;
-
+  
   /**
    * @param recipeSearchCriteria
    * @return
