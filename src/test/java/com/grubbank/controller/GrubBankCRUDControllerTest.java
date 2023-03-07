@@ -9,7 +9,6 @@ import com.grubbank.service.GrubBankCRUDService;
 import java.util.Arrays;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -35,8 +33,7 @@ public class GrubBankCRUDControllerTest {
 
   @Autowired MockMvc mockMvc;
 
-  @MockBean
-  GrubBankCRUDService grubBankCRUDService;
+  @MockBean GrubBankCRUDService grubBankCRUDService;
 
   Recipe recipe = TestInputGenerator.createValidRecipe();
   String exampleJSON2 = "{\"payload\":[{\"id\": 1,\"numberOfServings\": 4,\"name\":\"Kheer\"}]}";
@@ -49,8 +46,11 @@ public class GrubBankCRUDControllerTest {
   @DisplayName("Add recipe - positive case")
   void testCreateRecipe() throws Exception {
     Mockito.when(grubBankCRUDService.saveRecipe(any())).thenReturn(recipe);
-    RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/grubbank/addRecipe").accept(MediaType.APPLICATION_JSON)
-            .content(exampleJSON2).contentType(MediaType.APPLICATION_JSON);
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post("/grubbank/addRecipe")
+            .accept(MediaType.APPLICATION_JSON)
+            .content(exampleJSON2)
+            .contentType(MediaType.APPLICATION_JSON);
     MvcResult result = mockMvc.perform(requestBuilder).andReturn();
     logger.info("response {}", result.getResponse());
     MockHttpServletResponse response = result.getResponse();

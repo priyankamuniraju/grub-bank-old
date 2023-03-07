@@ -80,7 +80,7 @@ public class GrubBankCRUDController {
    */
   @PostMapping("/updateRecipeById/{recipeId}")
   @ResponseBody
-  ResponseEntity<GrubResponseBody<Recipe>> updateRecipeById(
+  ResponseEntity<GrubResponseBody<? extends Streamable>> updateRecipeById(
       @PathVariable int recipeId, @RequestBody Recipe recipe) {
     try {
       return new ResponseEntity<>(
@@ -88,15 +88,24 @@ public class GrubBankCRUDController {
               String.format("Successfully updated the recipe with recipe id : %s", recipeId),
               grubBankCRUDService.updateRecipe(recipe, recipeId)),
           HttpStatus.OK);
-    } catch (RecipeNotFoundException
-        | RecipeValidator.InvalidRecipeException
-        | JsonProcessingException exception) {
+    } catch (RecipeNotFoundException | JsonProcessingException exception) {
       return new ResponseEntity<>(
           new GrubResponseBody<>(
               String.format(
                   "Failed to update the recipe with recipe id : %s, exception %s",
                   recipeId, exception.getMessage()),
-              null),
+              ErrorPayload.builder().detail(exception.getMessage()).exception(exception).build()),
+          HttpStatus.BAD_REQUEST);
+    } catch (RecipeValidator.InvalidRecipeException invalidRecipeException) {
+      return new ResponseEntity<>(
+          new GrubResponseBody<>(
+              String.format(
+                  "Failed to update the recipe with recipe id : %s, exception %s",
+                  recipeId, invalidRecipeException.getMessage()),
+              ErrorPayload.builder()
+                  .detail(invalidRecipeException.getDetail())
+                  .exception(invalidRecipeException)
+                  .build()),
           HttpStatus.BAD_REQUEST);
     }
   }
