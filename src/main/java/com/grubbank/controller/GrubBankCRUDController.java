@@ -1,6 +1,7 @@
 package com.grubbank.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.grubbank.apimodel.RecipeSearchCriteria;
 import com.grubbank.apimodel.Streamable;
 import com.grubbank.entity.Recipe;
 import com.grubbank.exception.RecipeNotFoundException;
@@ -121,5 +122,11 @@ public class GrubBankCRUDController {
               null),
           HttpStatus.OK);
     }
+  }
+
+
+  @PostMapping("/search")
+  ResponseEntity<GrubResponseBody<List<Recipe>>> searchByCriteria(@RequestBody RecipeSearchCriteria recipeSearchCriteria) {
+    grubBankCRUDService.searchByCriteria(recipeSearchCriteria);
   }
 }

@@ -5,5 +5,5 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
 public class GrubBankRepositoryTest {
-  @Autowired GrubBankRepository grubBankRepository;
+  @Autowired RecipeRepository grubBankRepository;
 }

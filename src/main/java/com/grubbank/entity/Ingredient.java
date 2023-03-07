@@ -20,7 +20,7 @@ public class Ingredient {
 
   @Column private String name;
 
-  @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "ingredientSet")
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "ingredientSet")
   @JsonIgnore
   List<Recipe> recipeSet;
 }

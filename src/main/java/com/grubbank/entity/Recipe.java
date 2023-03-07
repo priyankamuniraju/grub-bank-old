@@ -26,7 +26,7 @@ public class Recipe implements Streamable {
 
   @Column private String instructions;
 
-  @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "ingredient_contain",
       joinColumns = @JoinColumn(name = "recipe_id"),
@@ -37,7 +37,7 @@ public class Recipe implements Streamable {
 
   @Column private Duration totalTime;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "nutritionalvalue_id")
   private NutritionalValue nutritionalValue;
 

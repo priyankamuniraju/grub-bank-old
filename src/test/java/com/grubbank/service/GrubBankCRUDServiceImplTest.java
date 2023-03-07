@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.grubbank.entity.Recipe;
 import com.grubbank.model.TestInputGenerator;
-import com.grubbank.repository.GrubBankRepository;
+import com.grubbank.repository.RecipeRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GrubBankCRUDServiceImplTest {
-  @Mock GrubBankRepository grubBankRepository;
+  @Mock RecipeRepository grubBankRepository;
 
   @Mock RecipeValidator recipeValidator;
 
