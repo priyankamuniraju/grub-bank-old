@@ -10,6 +10,8 @@ import com.grubbank.response.GrubBankResponseBody;
 import com.grubbank.service.GrubBankCRUDService;
 import com.grubbank.validator.RecipeSearchCriteriaValidator;
 import com.grubbank.validator.RecipeValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,8 @@ public class GrubBankCRUDController {
     public static final String RECIPE_FETCH_SUCCESS = "Successfully fetched the recipe(s) !!";
     public static final String NO_RECIPES_FOUND = "No recipes found!";
 
+    private static final Logger logger = LoggerFactory.getLogger(GrubBankCRUDController.class);
+
     @Autowired
     private GrubBankCRUDService grubBankCRUDService;
 
@@ -40,6 +44,7 @@ public class GrubBankCRUDController {
                     new GrubBankResponseBody<>(RECIPE_ADD_SUCCESS, grubBankCRUDService.saveRecipe(recipe)),
                     HttpStatus.OK);
         } catch (RecipeValidator.InvalidRecipeException invalidRecipeException) {
+            logger.error(RECIPE_ADD_FAILED);
             return new ResponseEntity<>(
                     new GrubBankResponseBody<>(
                             String.format(RECIPE_ADD_FAILED, invalidRecipeException.getMessage()),
@@ -95,6 +100,9 @@ public class GrubBankCRUDController {
                             grubBankCRUDService.updateRecipe(recipe, recipeId)),
                     HttpStatus.OK);
         } catch (RecipeNotFoundException | JsonProcessingException exception) {
+            logger.error(String.format(
+                    "Failed to update the recipe with recipe id : %s, exception %s",
+                    recipeId, exception.getMessage()));
             return new ResponseEntity<>(
                     new GrubBankResponseBody<>(
                             String.format(
@@ -103,6 +111,9 @@ public class GrubBankCRUDController {
                             ErrorPayload.builder().detail(exception.getMessage()).exception(exception).build()),
                     HttpStatus.BAD_REQUEST);
         } catch (RecipeValidator.InvalidRecipeException invalidRecipeException) {
+            logger.error(String.format(
+                    "Failed to update the recipe with recipe id : %s, exception %s",
+                    recipeId, invalidRecipeException.getMessage()));
             return new ResponseEntity<>(
                     new GrubBankResponseBody<>(
                             String.format(
@@ -130,6 +141,9 @@ public class GrubBankCRUDController {
                             null),
                     HttpStatus.OK);
         } catch (RecipeNotFoundException recipeNotFoundException) {
+            logger.error(String.format(
+                    "Failed to delete the recipe with recipeId!! : %s, exception %s ",
+                    recipeId, recipeNotFoundException.getMessage()));
             return new ResponseEntity<>(
                     new GrubBankResponseBody<>(
                             String.format(
@@ -156,6 +170,7 @@ public class GrubBankCRUDController {
         } catch (
                 RecipeSearchCriteriaValidator.InvalidRecipeSearchCriteriaException
                         invalidRecipeSearchCriteriaException) {
+            logger.error( String.format(RECIPE_ADD_FAILED, invalidRecipeSearchCriteriaException.getMessage()));
             return new ResponseEntity<>(
                     new GrubBankResponseBody<>(
                             String.format(RECIPE_ADD_FAILED, invalidRecipeSearchCriteriaException.getMessage()),
