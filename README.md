@@ -5,8 +5,7 @@ Grub Bank (or Food bank) is a standalone java application to store your favourit
 Pre-requisite : Java 11, a client like POSTMAN or browser to hit the application end points.
 
 Steps :
-1. Open your terminal
-2. On your terminal navigate to a desired location on your machine where you want to place the project (eg : cd Documents)
+1. Open your terminal and navigate to a desired location on your machine, where you want to place the project (eg : cd Documents)
 3. Here execute the command : git clone https://github.com/priyankamuniraju/grubbank.git
 4. Navigate to the project(grubbank) folder (eg: cd grubbank)
 5. Run the command : ./gradlew bootrun
@@ -16,4 +15,4 @@ a.)Go to the file - /grubbank/src/main/resources/application.properties
 b.)And add the following line :server.port=8081 . Now the grubbank uses port 8081.
 c.)Save the changes and repeat step 5
 Alternately you can kill the current process running on 8080 and repeat step 5
-8. Now that the application is up and running, the application can be used through clients like POSTMAN or a browser by hitting the REST endpoints described here : https://github.com/priyankamuniraju/grubbank/wiki 
+8. Now that the application is up and running, the application can be used through clients like POSTMAN or a browser by hitting the REST endpoints described here : https://github.com/priyankamuniraju/grubbank/wiki
