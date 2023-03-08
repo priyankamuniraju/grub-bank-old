@@ -3,14 +3,13 @@ package com.grubbank.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.grubbank.apimodel.Streamable;
+import java.time.Duration;
+import java.util.List;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.time.Duration;
-import java.util.List;
 
 @Entity
 @Data

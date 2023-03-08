@@ -4,16 +4,15 @@ import com.grubbank.apimodel.RecipeSearchCriteria;
 import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.Recipe;
 import com.grubbank.validator.RecipeSearchCriteriaValidator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
@@ -34,7 +33,7 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
     Root<Recipe> recipeRoot = subquery.from(Recipe.class);
     Join<Recipe, Ingredient> ingredientRecipeJoin = recipeRoot.join("ingredientList");
     List<String> ingredientNames =
-              ingredientList.stream().map(Ingredient::getName).collect(Collectors.toList());
+        ingredientList.stream().map(Ingredient::getName).collect(Collectors.toList());
     Predicate predicate = ingredientRecipeJoin.get("name").in(ingredientNames);
     subquery.select(recipeRoot.get("id")).where(predicate);
     if (include) {
@@ -42,7 +41,6 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
     } else {
       predicateList.add(criteriaBuilder.in(recipe.get("id")).value(subquery).not());
     }
-
   }
 
   @Override

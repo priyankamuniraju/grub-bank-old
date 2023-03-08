@@ -16,6 +16,7 @@ import com.grubbank.repository.RecipeRepository;
 import com.grubbank.response.GrubBankResponseBody;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,67 +42,66 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 @AutoConfigureTestDatabase
 public class GrubBankControllerIntegrationTest {
 
+  @Autowired private ObjectMapper objectMapper;
+  @Autowired private MockMvc mockMvc;
+  @Autowired private RecipeRepository recipeRepository;
+  @Autowired private IngredientRepository ingredientRepository;
+  @Autowired private NutritionalValueRepository nutritionalValueRepository;
 
-    @Autowired
-    NutritionalValueRepository nutritionalValueRepository;
-    @Autowired
-    ObjectMapper objectMapper;
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private RecipeRepository recipeRepository;
-    @Autowired
-    private IngredientRepository ingredientRepository;
+  @AfterEach
+  public void afterEachTest() {
+    recipeRepository.deleteAll();
+    ingredientRepository.deleteAll();
+    nutritionalValueRepository.deleteAll();
+  }
 
-    private GrubBankResponseBody<Recipe> saveOrUpdateApiCall(
-            String input, String apiPath, String responseMessage) throws Exception {
-        ResultActions resultActions =
-                mockMvc
-                        .perform(
-                                MockMvcRequestBuilders.post(apiPath)
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(input))
-                        .andExpect(status().isOk())
-                        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                        .andExpect(jsonPath("$.message").value(responseMessage));
+  private GrubBankResponseBody<Recipe> saveOrUpdateApiCall(
+      String input, String apiPath, String responseMessage) throws Exception {
+    ResultActions resultActions =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post(apiPath)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(input))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.message").value(responseMessage));
 
-        MvcResult result = resultActions.andReturn();
-        String responseStr = result.getResponse().getContentAsString();
+    MvcResult result = resultActions.andReturn();
+    String responseStr = result.getResponse().getContentAsString();
 
-        TypeReference<GrubBankResponseBody<Recipe>> typeToken = new TypeReference<>() {
-        };
-        return objectMapper.readValue(responseStr, typeToken);
-    }
+    TypeReference<GrubBankResponseBody<Recipe>> typeToken = new TypeReference<>() {};
+    return objectMapper.readValue(responseStr, typeToken);
+  }
 
-    private GrubBankResponseBody<Recipe> deleteApiCall(String apiPath, String responseMessage) throws Exception {
-        ResultActions resultActions = mockMvc
-                .perform(MockMvcRequestBuilders.delete(apiPath))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value(responseMessage));
-      MvcResult result = resultActions.andReturn();
-      String responseStr = result.getResponse().getContentAsString();
+  private GrubBankResponseBody<Recipe> deleteApiCall(String apiPath, String responseMessage)
+      throws Exception {
+    ResultActions resultActions =
+        mockMvc
+            .perform(MockMvcRequestBuilders.delete(apiPath))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.message").value(responseMessage));
+    MvcResult result = resultActions.andReturn();
+    String responseStr = result.getResponse().getContentAsString();
 
-      TypeReference<GrubBankResponseBody<Recipe>> typeToken = new TypeReference<>() {
-      };
-      return objectMapper.readValue(responseStr, typeToken);
-    }
+    TypeReference<GrubBankResponseBody<Recipe>> typeToken = new TypeReference<>() {};
+    return objectMapper.readValue(responseStr, typeToken);
+  }
 
+  @Test
+  public void addRecipeWithValidData_thenStatus200() throws Exception {
+    Recipe input = TestInputGenerator.createValidRecipe();
+    GrubBankResponseBody<Recipe> addedRecipe =
+        saveOrUpdateApiCall(
+            objectMapper.writeValueAsString(input),
+            "/grubbank/addRecipe",
+            GrubBankCRUDController.RECIPE_ADD_SUCCESS);
 
-    @Test
-    public void addRecipeWithValidData_thenStatus200() throws Exception {
-        Recipe input = TestInputGenerator.createValidRecipe();
-        GrubBankResponseBody<Recipe> addedRecipe =
-                saveOrUpdateApiCall(
-                        objectMapper.writeValueAsString(input),
-                        "/grubbank/addRecipe",
-                        GrubBankCRUDController.RECIPE_ADD_SUCCESS);
+    Assertions.assertEquals(
+        input.getNumberOfServings(), addedRecipe.getPayload().getNumberOfServings());
+    Assertions.assertEquals(input.getName(), addedRecipe.getPayload().getName());
 
-        Assertions.assertEquals(
-                input.getNumberOfServings(), addedRecipe.getPayload().getNumberOfServings());
-        Assertions.assertEquals(input.getName(), addedRecipe.getPayload().getName());
-
-       
     // Verify whether the Recipe is stored in the datastore.
     List<Recipe> recipeList = (List<Recipe>) recipeRepository.findAll();
     Assertions.assertEquals(1, recipeList.size());
@@ -200,10 +200,9 @@ public class GrubBankControllerIntegrationTest {
                   /*since we removed the first ingredient from original list,
                   we need to match the i + 1 th entry on original list to
                   the ith entry in the updated list*/
-                                    inputIngredientList.get(i + 1).getName(), updatedIngredientList.get(i).getName());
-                        });
-    }
-
+                  inputIngredientList.get(i + 1).getName(), updatedIngredientList.get(i).getName());
+            });
+  }
 
   @Test
   public void deleteRecipeWithValidRecipeID_thenStatus200() throws Exception {
@@ -211,10 +210,10 @@ public class GrubBankControllerIntegrationTest {
     // First add the recipe
     Recipe input = TestInputGenerator.createValidRecipe();
     GrubBankResponseBody<Recipe> responseBody =
-            saveOrUpdateApiCall(
-                    objectMapper.writeValueAsString(input),
-                    "/grubbank/addRecipe",
-                    GrubBankCRUDController.RECIPE_ADD_SUCCESS);
+        saveOrUpdateApiCall(
+            objectMapper.writeValueAsString(input),
+            "/grubbank/addRecipe",
+            GrubBankCRUDController.RECIPE_ADD_SUCCESS);
 
     // assuming the add is successful, grab the id from the add and use it to delete.
     Recipe recipeStored = responseBody.getPayload();
@@ -222,8 +221,9 @@ public class GrubBankControllerIntegrationTest {
 
     // call the delete api
     GrubBankResponseBody<Recipe> deleteResponseBody =
-            deleteApiCall("/grubbank/deleteRecipeById/"+id,
-                    "Successfully deleted the recipe with recipeId!! : "+id);
+        deleteApiCall(
+            "/grubbank/deleteRecipeById/" + id,
+            "Successfully deleted the recipe with recipeId!! : " + id);
     Recipe deletedRecipe = deleteResponseBody.getPayload();
     String expectedMessage = deleteResponseBody.getMessage();
 
@@ -237,7 +237,6 @@ public class GrubBankControllerIntegrationTest {
       Assertions.assertNotEquals(listRecipe.getId(), id);
     }
   }
-
 
   @Test
   public void deleteRecipeWithInvalidData_thenStatus400() throws Exception {

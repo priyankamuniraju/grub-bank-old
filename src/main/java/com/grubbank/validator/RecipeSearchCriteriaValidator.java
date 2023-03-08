@@ -17,7 +17,7 @@ public class RecipeSearchCriteriaValidator {
     // if default object, return nothing
     if (recipeSearchCriteria.equals(RecipeSearchCriteria.builder().build())) {
       throw new InvalidRecipeSearchCriteriaException(
-              InvalidField.ALL, "Empty or Invalid Recipe search criteria passed");
+          InvalidField.ALL, "Empty or Invalid Recipe search criteria passed");
     }
   }
 
