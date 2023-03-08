@@ -25,7 +25,7 @@ public class RecipeValidator {
           com.grubbank.validator.InvalidField.PREPARATION_TIME,
           "Preparation time should be positive");
     }
-    if (recipe.getIngredientSet() == null || recipe.getIngredientSet().isEmpty()) {
+    if (recipe.getIngredientList() == null || recipe.getIngredientList().isEmpty()) {
       throw new InvalidRecipeException(
           com.grubbank.validator.InvalidField.INGREDIENT, "Ingredients cannot be empty");
     }

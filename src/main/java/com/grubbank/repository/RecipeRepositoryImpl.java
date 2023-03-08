@@ -6,7 +6,6 @@ import com.grubbank.entity.Recipe;
 import com.grubbank.validator.RecipeSearchCriteriaValidator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -24,7 +23,7 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
 
   private void updateIncludeExcludePredicate(
       Root<Recipe> recipe,
-      Set<Ingredient> ingredientSet,
+      List<Ingredient> ingredientList,
       CriteriaQuery<Recipe> criteriaQuery,
       CriteriaBuilder criteriaBuilder,
       List<Predicate> predicateList,
@@ -32,10 +31,10 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
 
     Subquery<Integer> subquery = criteriaQuery.subquery(Integer.class);
     Root<Recipe> recipeRoot = subquery.from(Recipe.class);
-    Join<Ingredient, Recipe> ingredientRecipeJoin = recipeRoot.join("ingredientSet");
+    Join<Ingredient, Recipe> ingredientRecipeJoin = recipeRoot.join("ingredientList");
     Predicate predicate;
     List<String> ingredientNames =
-        ingredientSet.stream().map(Ingredient::getName).collect(Collectors.toList());
+        ingredientList.stream().map(Ingredient::getName).collect(Collectors.toList());
     if (include) {
       // Select the Recipe id where one of their ingredients matches
       predicate = ingredientRecipeJoin.get("name").in(ingredientNames);
@@ -65,18 +64,18 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
     }
 
     // predicate for recipeType
-    if (recipeSearchCriteria.getRecipeTypeSet() != null) {
+    if (recipeSearchCriteria.getRecipeTypeList() != null) {
       CriteriaBuilder.In<Recipe.RecipeType> recipeTypePredicate =
           criteriaBuilder.in(recipe.get("recipeType"));
-      recipeSearchCriteria.getRecipeTypeSet().forEach(recipeTypePredicate::value);
+      recipeSearchCriteria.getRecipeTypeList().forEach(recipeTypePredicate::value);
       predicateList.add(recipeTypePredicate);
     }
 
     // predicate for ingredient Include list
-    if (recipeSearchCriteria.getIngredientIncludeSet() != null) {
+    if (recipeSearchCriteria.getIngredientIncludeList() != null) {
       updateIncludeExcludePredicate(
           recipe,
-          recipeSearchCriteria.getIngredientIncludeSet(),
+          recipeSearchCriteria.getIngredientIncludeList(),
           criteriaQuery,
           criteriaBuilder,
           predicateList,
@@ -84,10 +83,10 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
     }
 
     // Predicate for ingredient Exclude list
-    if (recipeSearchCriteria.getIngredientExcludeSet() != null) {
+    if (recipeSearchCriteria.getIngredientExcludeList() != null) {
       updateIncludeExcludePredicate(
           recipe,
-          recipeSearchCriteria.getIngredientExcludeSet(),
+          recipeSearchCriteria.getIngredientExcludeList(),
           criteriaQuery,
           criteriaBuilder,
           predicateList,

@@ -33,7 +33,7 @@ public class TestInputGenerator {
             .build();
     return Recipe.builder()
         .name("Kheer")
-        .ingredientSet(ingredientList)
+        .ingredientList(ingredientList)
         .recipeType(Recipe.RecipeType.VEGETARIAN)
         .nutritionalValue(nutritionalValue)
         .numberOfServings(3)

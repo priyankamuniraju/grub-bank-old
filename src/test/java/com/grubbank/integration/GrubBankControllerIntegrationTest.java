@@ -106,12 +106,12 @@ public class GrubBankControllerIntegrationTest {
 
     // Verify whether the ingredients are stored in the datastore
     List<Ingredient> ingredientList = (List<Ingredient>) ingredientRepository.findAll();
-    Assertions.assertEquals(input.getIngredientSet().size(), ingredientList.size());
+    Assertions.assertEquals(input.getIngredientList().size(), ingredientList.size());
     IntStream.range(0, ingredientList.size())
         .forEach(
             i ->
                 Assertions.assertEquals(
-                    input.getIngredientSet().get(i).getName(), ingredientList.get(i).getName()));
+                    input.getIngredientList().get(i).getName(), ingredientList.get(i).getName()));
 
     // Verify whether the NutritionalValue is stored in the datastore
     List<NutritionalValue> nutritionalValueList =
@@ -158,7 +158,7 @@ public class GrubBankControllerIntegrationTest {
             "/grubbank/addRecipe",
             GrubBankCRUDController.RECIPE_ADD_SUCCESS);
 
-    List<Ingredient> inputIngredientList = input.getIngredientSet();
+    List<Ingredient> inputIngredientList = input.getIngredientList();
 
     // assuming the add is successful, grab the id from the add and use it to update.
     Recipe recipeStored = responseBody.getPayload();
@@ -169,7 +169,7 @@ public class GrubBankControllerIntegrationTest {
     int newNumberOfServings = recipeStored.getNumberOfServings() + 3;
     recipeStored.setNumberOfServings(newNumberOfServings);
     // remove the first ingredient
-    recipeStored.getIngredientSet().remove(0);
+    recipeStored.getIngredientList().remove(0);
 
     // call update api
     GrubResponseBody<Recipe> updateResponseBody =
@@ -179,7 +179,7 @@ public class GrubBankControllerIntegrationTest {
             "Successfully updated the recipe with recipe id : " + id);
 
     Recipe recipeUpdated = updateResponseBody.getPayload();
-    List<Ingredient> updatedIngredientList = recipeUpdated.getIngredientSet();
+    List<Ingredient> updatedIngredientList = recipeUpdated.getIngredientList();
     Assertions.assertEquals(id, recipeUpdated.getId());
     Assertions.assertEquals(newNumberOfServings, recipeUpdated.getNumberOfServings());
     int expectedIngredientSize = inputIngredientList.size() - 1;

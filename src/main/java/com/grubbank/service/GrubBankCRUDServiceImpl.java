@@ -53,7 +53,7 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
   @Transactional
   public Recipe saveRecipe(Recipe recipe) throws RecipeValidator.InvalidRecipeException {
     recipeValidator.validateRecipe(recipe);
-    recipe.getIngredientSet().forEach(ingredient -> ingredientRepository.save(ingredient));
+    recipe.getIngredientList().forEach(ingredient -> ingredientRepository.save(ingredient));
     nutritionalValueRepository.save(recipe.getNutritionalValue());
     return recipeRepository.save(recipe);
   }
@@ -87,9 +87,9 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
       ObjectNode recipeFromCallerNode = objectMapper.valueToTree(recipe);
       Recipe recipeInDB = recipeInDBMaybe.get();
 
-      if (recipe.getIngredientSet() != null) {
+      if (recipe.getIngredientList() != null) {
         // Update the ingredients only if sent as part of the input
-        recipe.getIngredientSet().forEach(ingredient -> ingredientRepository.save(ingredient));
+        recipe.getIngredientList().forEach(ingredient -> ingredientRepository.save(ingredient));
       }
 
       if (recipe.getNutritionalValue() != null) {

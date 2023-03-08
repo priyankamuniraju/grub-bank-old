@@ -31,7 +31,7 @@ public class Recipe implements Streamable {
       name = "ingredient_contain",
       joinColumns = @JoinColumn(name = "recipe_id"),
       inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
-  private List<Ingredient> ingredientSet;
+  private List<Ingredient> ingredientList;
 
   @Column private Duration preparationTime;
 

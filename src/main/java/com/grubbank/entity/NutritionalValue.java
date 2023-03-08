@@ -3,7 +3,8 @@ package com.grubbank.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import java.util.Set;
+
+import java.util.List;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,7 +54,7 @@ public class NutritionalValue {
   @OneToMany
   @JsonIgnore
   @JoinColumn(name = "recipe_id")
-  Set<Recipe> recipeSet;
+  List<Recipe> recipeList;
 
   @Data
   @Builder

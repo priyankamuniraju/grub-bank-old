@@ -2,7 +2,9 @@ package com.grubbank.apimodel;
 
 import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.Recipe;
-import java.util.Set;
+
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,13 +18,13 @@ import lombok.NoArgsConstructor;
 /*
  The Search criteria for searching {@link Recipe} in the datastore
  Currently it supports search by doing an AND query with each of the supplied params
- If the param type is a list/set, such as {@link RecipeSearchCriteria#ingredientIncludeSet},
+ If the param type is a list, such as {@link RecipeSearchCriteria#ingredientIncludeList},
  then an in/not in is applied based on the parameter.
 */
 public class RecipeSearchCriteria {
   private int numberOfServings;
-  private Set<Recipe.RecipeType> recipeTypeSet;
-  private Set<Ingredient> ingredientIncludeSet;
-  private Set<Ingredient> ingredientExcludeSet;
+  private List<Recipe.RecipeType> recipeTypeList;
+  private List<Ingredient> ingredientIncludeList;
+  private List<Ingredient> ingredientExcludeList;
   private String instructionContains;
 }
