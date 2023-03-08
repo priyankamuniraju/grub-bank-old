@@ -4,15 +4,16 @@ import com.grubbank.apimodel.RecipeSearchCriteria;
 import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.Recipe;
 import com.grubbank.validator.RecipeSearchCriteriaValidator;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class RecipeRepositoryImpl implements RecipeRepositoryCustom {

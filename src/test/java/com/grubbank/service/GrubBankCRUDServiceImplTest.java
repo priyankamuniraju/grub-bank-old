@@ -1,8 +1,5 @@
 package com.grubbank.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
 import com.grubbank.entity.Recipe;
 import com.grubbank.model.TestInputGenerator;
 import com.grubbank.repository.RecipeRepository;
@@ -13,6 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GrubBankCRUDServiceImplTest {

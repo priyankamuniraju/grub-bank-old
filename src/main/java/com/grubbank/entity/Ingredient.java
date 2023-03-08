@@ -1,12 +1,13 @@
 package com.grubbank.entity;
 
-import com.fasterxml.jackson.annotation.*;
-import java.util.List;
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,7 +19,7 @@ public class Ingredient {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
 
-  @Column private String name;
+  private String name;
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "ingredientList")
   @JsonIgnore
