@@ -101,7 +101,6 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
     }
 
     criteriaQuery.where(predicateList.toArray(new Predicate[0]));
-    List<Recipe> recipeList = entityManager.createQuery(criteriaQuery).getResultList();
-    return recipeList;
+    return entityManager.createQuery(criteriaQuery).getResultList();
   }
 }
