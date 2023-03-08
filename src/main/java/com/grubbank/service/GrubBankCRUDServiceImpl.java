@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.grubbank.apimodel.RecipeSearchCriteria;
+import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.Recipe;
 import com.grubbank.exception.RecipeNotFoundException;
 import com.grubbank.repository.IngredientRepository;
@@ -84,19 +85,27 @@ public class GrubBankCRUDServiceImpl implements GrubBankCRUDService {
           String.format("No recipe with recipe id :%s found in the grub bank.", recipeId));
     } else {
       // grab only the fields that are to be updated
-      ObjectNode recipeFromCallerNode = objectMapper.valueToTree(recipe);
+
       Recipe recipeInDB = recipeInDBMaybe.get();
 
-      if (recipe.getIngredientList() != null) {
+      List<Ingredient> inputIngredientList = recipe.getIngredientList();
+      if (inputIngredientList != null) {
         // Update the ingredients only if sent as part of the input
-        recipe.getIngredientList().forEach(ingredient -> ingredientRepository.save(ingredient));
+        inputIngredientList.replaceAll(
+            ingredient -> {
+              Ingredient saved = ingredientRepository.save(ingredient);
+              return saved;
+            });
       }
 
       if (recipe.getNutritionalValue() != null) {
         // Update the nutritionalValue only if sent as part of the input
-        nutritionalValueRepository.save(recipe.getNutritionalValue());
+        recipe.setNutritionalValue(nutritionalValueRepository.save(recipe.getNutritionalValue()));
       }
 
+      // Convert the Recipe from the input and updated relationships to a node so that only set
+      // fields are updated.
+      ObjectNode recipeFromCallerNode = objectMapper.valueToTree(recipe);
       // Convert the recipe from the DB to a Json node so that attributes can be set easily
       ObjectNode recipeFromDBNode = objectMapper.valueToTree(recipeInDB);
       // Iterate through the changed params from the caller (client) and update the same in the
