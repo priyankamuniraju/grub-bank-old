@@ -1,11 +1,15 @@
 package com.grubbank.entity;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.grubbank.apimodel.Streamable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 import java.time.Duration;
 import java.util.List;
-import javax.persistence.*;
-import lombok.*;
 
 @Entity
 @Data
@@ -20,11 +24,11 @@ public class Recipe implements Streamable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
 
-  @Column private int numberOfServings;
+  private int numberOfServings;
 
-  @Column private String name;
+  private String name;
 
-  @Column private String instructions;
+  private String instructions;
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -33,20 +37,19 @@ public class Recipe implements Streamable {
       inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
   private List<Ingredient> ingredientSet;
 
-  @Column private Duration preparationTime;
+  private Duration preparationTime;
 
-  @Column private Duration totalTime;
+  private Duration totalTime;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "nutritionalvalue_id")
   private NutritionalValue nutritionalValue;
 
-  @Column private RecipeType recipeType;
+  private RecipeType recipeType;
 
   public enum RecipeType {
     VEGAN,
-    WHITE_MEAT,
-    RED_MEAT,
+    NON_VEGETARIAN,
     VEGETARIAN,
     SEA_FOOD
   }

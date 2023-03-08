@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GrubResponseBody<T> {
+public class GrubBankResponseBody<T> {
   private String message;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)

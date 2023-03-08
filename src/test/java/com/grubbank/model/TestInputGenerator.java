@@ -1,15 +1,16 @@
 package com.grubbank.model;
 
-import static com.grubbank.entity.NutritionalValue.Unit.GM;
-import static com.grubbank.entity.NutritionalValue.Unit.JOULE;
-
 import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.NutritionalValue;
 import com.grubbank.entity.Recipe;
+
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.grubbank.entity.NutritionalValue.Unit.GM;
+import static com.grubbank.entity.NutritionalValue.Unit.JOULE;
 
 public class TestInputGenerator {
 

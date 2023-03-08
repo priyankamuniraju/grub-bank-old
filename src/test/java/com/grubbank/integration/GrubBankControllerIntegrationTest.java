@@ -11,9 +11,8 @@ import com.grubbank.model.TestInputGenerator;
 import com.grubbank.repository.IngredientRepository;
 import com.grubbank.repository.NutritionalValueRepository;
 import com.grubbank.repository.RecipeRepository;
-import com.grubbank.response.GrubResponseBody;
+import com.grubbank.response.GrubBankResponseBody;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,7 @@ public class GrubBankControllerIntegrationTest {
     @Autowired
     private IngredientRepository ingredientRepository;
 
-    private GrubResponseBody<Recipe> saveOrUpdateApiCall(
+    private GrubBankResponseBody<Recipe> saveOrUpdateApiCall(
             String input, String apiPath, String responseMessage) throws Exception {
         ResultActions resultActions =
                 mockMvc
@@ -69,12 +68,12 @@ public class GrubBankControllerIntegrationTest {
         MvcResult result = resultActions.andReturn();
         String responseStr = result.getResponse().getContentAsString();
 
-        TypeReference<GrubResponseBody<Recipe>> typeToken = new TypeReference<>() {
+        TypeReference<GrubBankResponseBody<Recipe>> typeToken = new TypeReference<>() {
         };
         return objectMapper.readValue(responseStr, typeToken);
     }
 
-    private GrubResponseBody<Recipe> deleteApiCall(String apiPath, String responseMessage) throws Exception {
+    private GrubBankResponseBody<Recipe> deleteApiCall(String apiPath, String responseMessage) throws Exception {
         ResultActions resultActions = mockMvc
                 .perform(MockMvcRequestBuilders.delete(apiPath))
                 .andExpect(status().isOk())
@@ -83,7 +82,7 @@ public class GrubBankControllerIntegrationTest {
       MvcResult result = resultActions.andReturn();
       String responseStr = result.getResponse().getContentAsString();
 
-      TypeReference<GrubResponseBody<Recipe>> typeToken = new TypeReference<>() {
+      TypeReference<GrubBankResponseBody<Recipe>> typeToken = new TypeReference<>() {
       };
       return objectMapper.readValue(responseStr, typeToken);
     }
@@ -92,7 +91,7 @@ public class GrubBankControllerIntegrationTest {
     @Test
     public void addRecipeWithValidData_thenStatus200() throws Exception {
         Recipe input = TestInputGenerator.createValidRecipe();
-        GrubResponseBody<Recipe> addedRecipe =
+        GrubBankResponseBody<Recipe> addedRecipe =
                 saveOrUpdateApiCall(
                         objectMapper.writeValueAsString(input),
                         "/grubbank/addRecipe",
@@ -160,7 +159,7 @@ public class GrubBankControllerIntegrationTest {
 
         // First add the recipe
         Recipe input = TestInputGenerator.createValidRecipe();
-        GrubResponseBody<Recipe> responseBody =
+        GrubBankResponseBody<Recipe> responseBody =
                 saveOrUpdateApiCall(
                         objectMapper.writeValueAsString(input),
                         "/grubbank/addRecipe",
@@ -180,7 +179,7 @@ public class GrubBankControllerIntegrationTest {
         recipeStored.getIngredientSet().remove(0);
 
         // call update api
-        GrubResponseBody<Recipe> updateResponseBody =
+        GrubBankResponseBody<Recipe> updateResponseBody =
                 saveOrUpdateApiCall(
                         objectMapper.writeValueAsString(recipeStored),
                         "/grubbank/updateRecipeById/" + id,
@@ -203,13 +202,13 @@ public class GrubBankControllerIntegrationTest {
                                     inputIngredientList.get(i + 1).getName(), updatedIngredientList.get(i).getName());
                         });
     }
-    
+
   @Test
   public void deleteRecipeWithValidRecipeID_thenStatus200() throws Exception{
 
     // First add the recipe
     Recipe input = TestInputGenerator.createValidRecipe();
-    GrubResponseBody<Recipe> responseBody =
+    GrubBankResponseBody<Recipe> responseBody =
             saveOrUpdateApiCall(
                     objectMapper.writeValueAsString(input),
                     "/grubbank/addRecipe",
@@ -221,7 +220,7 @@ public class GrubBankControllerIntegrationTest {
     int id = recipeStored.getId();
 
     // call the delete api
-    GrubResponseBody<Recipe> deleteResponseBody =
+    GrubBankResponseBody<Recipe> deleteResponseBody =
             deleteApiCall("/grubbank/deleteRecipeById/"+id,
                     "Successfully deleted the recipe with recipeId!! : "+id);
     Recipe deletedRecipe = deleteResponseBody.getPayload();
@@ -244,7 +243,7 @@ public class GrubBankControllerIntegrationTest {
 
         // First add the recipe (first recipe added)
         Recipe input = TestInputGenerator.createValidRecipe();
-        GrubResponseBody<Recipe> responseBody =
+        GrubBankResponseBody<Recipe> responseBody =
                 saveOrUpdateApiCall(
                         objectMapper.writeValueAsString(input),
                         "/grubbank/addRecipe",
