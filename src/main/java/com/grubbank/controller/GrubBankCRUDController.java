@@ -106,7 +106,7 @@ public class GrubBankCRUDController {
                   .detail(invalidRecipeException.getDetail())
                   .exception(invalidRecipeException)
                   .build()),
-          HttpStatus.BAD_REQUEST);
+          HttpStatus.CONFLICT);
     }
   }
 
@@ -130,7 +130,7 @@ public class GrubBankCRUDController {
                   "Failed to delete the recipe with recipeId!! : %s, exception %s ",
                   recipeId, recipeNotFoundException.getMessage()),
               null),
-          HttpStatus.OK);
+          HttpStatus.BAD_REQUEST);
     }
   }
 
