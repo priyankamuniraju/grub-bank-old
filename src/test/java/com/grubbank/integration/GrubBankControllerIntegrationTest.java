@@ -1,5 +1,7 @@
 package com.grubbank.integration;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grubbank.GrubbankApplication;
@@ -12,6 +14,8 @@ import com.grubbank.repository.IngredientRepository;
 import com.grubbank.repository.NutritionalValueRepository;
 import com.grubbank.repository.RecipeRepository;
 import com.grubbank.response.GrubBankResponseBody;
+import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,19 +32,15 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = GrubbankApplication.class)
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    classes = GrubbankApplication.class)
 @AutoConfigureMockMvc
 @EnableAutoConfiguration(exclude = SecurityAutoConfiguration.class)
 @AutoConfigureTestDatabase
 public class GrubBankControllerIntegrationTest {
+
 
     @Autowired
     NutritionalValueRepository nutritionalValueRepository;
@@ -135,25 +135,26 @@ public class GrubBankControllerIntegrationTest {
                 input.getNutritionalValue().getProteins(), nutritionalValueFromDB.getProteins());
     }
 
-    @Test
-    public void addRecipeWithInvalidData_thenStatus400() throws Exception {
-        Recipe input = TestInputGenerator.createValidRecipe();
 
-        // set the invalid servings so that the request will fail
-        input.setNumberOfServings(-2);
-        mockMvc
-                .perform(
-                        MockMvcRequestBuilders.post("/grubbank/addRecipe")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(input)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(
-                        jsonPath("$.message")
-                                .value(
-                                        "Failed to save the recipe Invalid input data for the field : NUMBER_SERVING"));
-    }
 
+  @Test
+  public void addRecipeWithInvalidData_thenStatus400() throws Exception {
+    Recipe input = TestInputGenerator.createValidRecipe();
+
+    // set the invalid servings so that the request will fail
+    input.setNumberOfServings(-2);
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/grubbank/addRecipe")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(input)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(
+            jsonPath("$.message")
+                .value(
+                    "Failed to save the recipe Invalid input data for the field : NUMBER_SERVING"));
+  }
     @Test
     public void updateRecipeValidData_thenStatus200() throws Exception {
 
@@ -203,8 +204,9 @@ public class GrubBankControllerIntegrationTest {
                         });
     }
 
+
   @Test
-  public void deleteRecipeWithValidRecipeID_thenStatus200() throws Exception{
+  public void deleteRecipeWithValidRecipeID_thenStatus200() throws Exception {
 
     // First add the recipe
     Recipe input = TestInputGenerator.createValidRecipe();
@@ -213,7 +215,6 @@ public class GrubBankControllerIntegrationTest {
                     objectMapper.writeValueAsString(input),
                     "/grubbank/addRecipe",
                     GrubBankCRUDController.RECIPE_ADD_SUCCESS);
-
 
     // assuming the add is successful, grab the id from the add and use it to delete.
     Recipe recipeStored = responseBody.getPayload();
@@ -227,39 +228,36 @@ public class GrubBankControllerIntegrationTest {
     String expectedMessage = deleteResponseBody.getMessage();
 
     Assertions.assertNull(deletedRecipe);
-    Assertions.assertEquals("Successfully deleted the recipe with recipeId!! : "+id, expectedMessage);
+    Assertions.assertEquals(
+        "Successfully deleted the recipe with recipeId!! : " + id, expectedMessage);
 
     // verify that recipe with recipeId = id not present in the db anymore
     List<Recipe> recipeList = (List<Recipe>) recipeRepository.findAll();
-    for (Recipe listRecipe :recipeList
-         ) {
+    for (Recipe listRecipe : recipeList) {
       Assertions.assertNotEquals(listRecipe.getId(), id);
-
-      }
     }
-
-    @Test
-    public void deleteRecipeWithInvalidData_thenStatus400() throws Exception {
-
-        // First add the recipe (first recipe added)
-        Recipe input = TestInputGenerator.createValidRecipe();
-        GrubBankResponseBody<Recipe> responseBody =
-                saveOrUpdateApiCall(
-                        objectMapper.writeValueAsString(input),
-                        "/grubbank/addRecipe",
-                        GrubBankCRUDController.RECIPE_ADD_SUCCESS);
+  }
 
 
-       // but call delete with recipe id not present in db
-        mockMvc
-                .perform(
-                        MockMvcRequestBuilders.delete("/grubbank/deleteRecipeById/1900"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(
-                        jsonPath("$.message")
-                                .value(
-                                        "Failed to delete the recipe with recipeId!! : 1900, exception No recipe found with recipe id : 1900 "));
-    }
+  @Test
+  public void deleteRecipeWithInvalidData_thenStatus400() throws Exception {
+
+    // First add the recipe (first recipe added)
+    Recipe input = TestInputGenerator.createValidRecipe();
+    GrubBankResponseBody<Recipe> responseBody =
+        saveOrUpdateApiCall(
+            objectMapper.writeValueAsString(input),
+            "/grubbank/addRecipe",
+            GrubBankCRUDController.RECIPE_ADD_SUCCESS);
+
+    // but call delete with recipe id not present in db
+    mockMvc
+        .perform(MockMvcRequestBuilders.delete("/grubbank/deleteRecipeById/1900"))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(
+            jsonPath("$.message")
+                .value(
+                    "Failed to delete the recipe with recipeId!! : 1900, exception No recipe found with recipe id : 1900 "));
+  }
 }
-
