@@ -21,7 +21,7 @@ import java.util.List;
 public class Recipe implements Streamable {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
   private int numberOfServings;

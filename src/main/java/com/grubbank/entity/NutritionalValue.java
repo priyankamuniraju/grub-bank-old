@@ -23,7 +23,7 @@ import java.util.Set;
 public class NutritionalValue {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
   @Embedded
