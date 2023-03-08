@@ -5,8 +5,10 @@ import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.Recipe;
 import com.grubbank.validator.RecipeSearchCriteriaValidator;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
@@ -28,27 +30,23 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
       CriteriaBuilder criteriaBuilder,
       List<Predicate> predicateList,
       boolean include) {
-    ingredientSet.forEach(
-        ingredient -> {
-          Subquery<Integer> subquery = criteriaQuery.subquery(Integer.class);
-          Root<Recipe> recipeRoot = subquery.from(Recipe.class);
-          Join<Ingredient, Recipe> ingredientRecipeJoin = recipeRoot.join("ingredientSet");
 
-          Predicate predicate;
-          if (include) {
-            // Select the Recipe id where one of their ingredients matches
-            predicate =
-                criteriaBuilder.equal(ingredientRecipeJoin.get("name"), ingredient.getName());
-          } else {
-            // Select the Recipe id where one of their ingredients doesn't match
-            predicate =
-                criteriaBuilder.notEqual(ingredientRecipeJoin.get("name"), ingredient.getName());
-          }
-
-          subquery.select(recipeRoot.get("id")).where(predicate);
-
-          predicateList.add(criteriaBuilder.in(recipe.get("id")).value(subquery));
-        });
+      Subquery<Integer> subquery = criteriaQuery.subquery(Integer.class);
+      Root<Recipe> recipeRoot = subquery.from(Recipe.class);
+      Join<Ingredient, Recipe> ingredientRecipeJoin = recipeRoot.join("ingredientSet");
+      Predicate predicate;
+      List<String> ingredientNames = ingredientSet.stream().map(Ingredient::getName).collect(Collectors.toList());
+      if (include) {
+          // Select the Recipe id where one of their ingredients matches
+          predicate =
+                  ingredientRecipeJoin.get("name").in(ingredientNames);
+      } else {
+          // Select the Recipe id where one of their ingredients doesn't match
+          predicate =
+                  ingredientRecipeJoin.get("name").in(ingredientNames).not();
+      }
+      subquery.select(recipeRoot.get("id")).where(predicate);
+      predicateList.add(criteriaBuilder.in(recipe.get("id")).value(subquery));
   }
 
   @Override
