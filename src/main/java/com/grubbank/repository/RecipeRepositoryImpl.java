@@ -5,7 +5,6 @@ import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.Recipe;
 import com.grubbank.validator.RecipeSearchCriteriaValidator;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,22 +30,21 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
       List<Predicate> predicateList,
       boolean include) {
 
-      Subquery<Integer> subquery = criteriaQuery.subquery(Integer.class);
-      Root<Recipe> recipeRoot = subquery.from(Recipe.class);
-      Join<Ingredient, Recipe> ingredientRecipeJoin = recipeRoot.join("ingredientSet");
-      Predicate predicate;
-      List<String> ingredientNames = ingredientSet.stream().map(Ingredient::getName).collect(Collectors.toList());
-      if (include) {
-          // Select the Recipe id where one of their ingredients matches
-          predicate =
-                  ingredientRecipeJoin.get("name").in(ingredientNames);
-      } else {
-          // Select the Recipe id where one of their ingredients doesn't match
-          predicate =
-                  ingredientRecipeJoin.get("name").in(ingredientNames).not();
-      }
-      subquery.select(recipeRoot.get("id")).where(predicate);
-      predicateList.add(criteriaBuilder.in(recipe.get("id")).value(subquery));
+    Subquery<Integer> subquery = criteriaQuery.subquery(Integer.class);
+    Root<Recipe> recipeRoot = subquery.from(Recipe.class);
+    Join<Ingredient, Recipe> ingredientRecipeJoin = recipeRoot.join("ingredientSet");
+    Predicate predicate;
+    List<String> ingredientNames =
+        ingredientSet.stream().map(Ingredient::getName).collect(Collectors.toList());
+    if (include) {
+      // Select the Recipe id where one of their ingredients matches
+      predicate = ingredientRecipeJoin.get("name").in(ingredientNames);
+    } else {
+      // Select the Recipe id where one of their ingredients doesn't match
+      predicate = ingredientRecipeJoin.get("name").in(ingredientNames).not();
+    }
+    subquery.select(recipeRoot.get("id")).where(predicate);
+    predicateList.add(criteriaBuilder.in(recipe.get("id")).value(subquery));
   }
 
   @Override
