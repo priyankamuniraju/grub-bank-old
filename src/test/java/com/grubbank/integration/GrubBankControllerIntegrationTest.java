@@ -160,7 +160,7 @@ public class GrubBankControllerIntegrationTest {
 
     // First add the recipe
     Recipe input = TestInputGenerator.createValidRecipe();
-    GrubResponseBody<Recipe> responseBody =
+    GrubBankResponseBody<Recipe> responseBody =
         saveOrUpdateApiCall(
             objectMapper.writeValueAsString(input),
             "/grubbank/addRecipe",
@@ -180,7 +180,7 @@ public class GrubBankControllerIntegrationTest {
     recipeStored.getIngredientList().remove(0);
 
     // call update api
-    GrubResponseBody<Recipe> updateResponseBody =
+    GrubBankResponseBody<Recipe> updateResponseBody =
         saveOrUpdateApiCall(
             objectMapper.writeValueAsString(recipeStored),
             "/grubbank/updateRecipeById/" + id,
