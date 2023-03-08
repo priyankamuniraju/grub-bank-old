@@ -32,19 +32,17 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
 
     Subquery<Integer> subquery = criteriaQuery.subquery(Integer.class);
     Root<Recipe> recipeRoot = subquery.from(Recipe.class);
-    Join<Ingredient, Recipe> ingredientRecipeJoin = recipeRoot.join("ingredientList");
-    Predicate predicate;
+    Join<Recipe, Ingredient> ingredientRecipeJoin = recipeRoot.join("ingredientList");
     List<String> ingredientNames =
-        ingredientList.stream().map(Ingredient::getName).collect(Collectors.toList());
-    if (include) {
-      // Select the Recipe id where one of their ingredients matches
-      predicate = ingredientRecipeJoin.get("name").in(ingredientNames);
-    } else {
-      // Select the Recipe id where one of their ingredients doesn't match
-      predicate = ingredientRecipeJoin.get("name").in(ingredientNames).not();
-    }
+              ingredientList.stream().map(Ingredient::getName).collect(Collectors.toList());
+    Predicate predicate = ingredientRecipeJoin.get("name").in(ingredientNames);
     subquery.select(recipeRoot.get("id")).where(predicate);
-    predicateList.add(criteriaBuilder.in(recipe.get("id")).value(subquery));
+    if (include) {
+      predicateList.add(criteriaBuilder.in(recipe.get("id")).value(subquery));
+    } else {
+      predicateList.add(criteriaBuilder.in(recipe.get("id")).value(subquery).not());
+    }
+
   }
 
   @Override

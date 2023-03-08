@@ -14,6 +14,11 @@ public class RecipeSearchCriteriaValidator {
       throw new InvalidRecipeSearchCriteriaException(
           InvalidField.NUMBER_SERVING, "Number of servings should be greater than zero");
     }
+    // if default object, return nothing
+    if (recipeSearchCriteria.equals(RecipeSearchCriteria.builder().build())) {
+      throw new InvalidRecipeSearchCriteriaException(
+              InvalidField.ALL, "Empty or Invalid Recipe search criteria passed");
+    }
   }
 
   @EqualsAndHashCode(callSuper = true)
@@ -26,7 +31,7 @@ public class RecipeSearchCriteriaValidator {
     public InvalidRecipeSearchCriteriaException(InvalidField invalidField, String message) {
       super(
           String.format(
-              "Invalid ReciperSearchCriteria passed invalid field %s", invalidField.name()));
+              "Invalid ReciperSearchCriteria passed invalid field/s : %s", invalidField.name()));
       this.invalidField = invalidField;
       this.detail = message;
     }

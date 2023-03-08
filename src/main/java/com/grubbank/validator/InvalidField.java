@@ -5,5 +5,7 @@ public enum InvalidField {
   INGREDIENT,
   NUMBER_SERVING,
   PREPARATION_TIME,
-  INSTRUCTIONS
+  INSTRUCTIONS,
+
+  ALL
 }

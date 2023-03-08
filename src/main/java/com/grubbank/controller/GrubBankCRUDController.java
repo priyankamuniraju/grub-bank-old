@@ -28,6 +28,8 @@ public class GrubBankCRUDController {
     public static final String RECIPE_FETCH_SUCCESS = "Successfully fetched the recipe(s) !!";
     public static final String NO_RECIPES_FOUND = "No recipes found!";
 
+    public static final String NO_RECIPES_FOUND_WITH_MESSAGE = "No recipes found! %s";
+
     private static final Logger logger = LoggerFactory.getLogger(GrubBankCRUDController.class);
 
     @Autowired
@@ -170,10 +172,10 @@ public class GrubBankCRUDController {
         } catch (
                 RecipeSearchCriteriaValidator.InvalidRecipeSearchCriteriaException
                         invalidRecipeSearchCriteriaException) {
-            logger.error( String.format(RECIPE_ADD_FAILED, invalidRecipeSearchCriteriaException.getMessage()));
+            logger.error( String.format(NO_RECIPES_FOUND_WITH_MESSAGE, invalidRecipeSearchCriteriaException.getMessage()));
             return new ResponseEntity<>(
                     new GrubBankResponseBody<>(
-                            String.format(RECIPE_ADD_FAILED, invalidRecipeSearchCriteriaException.getMessage()),
+                            String.format(NO_RECIPES_FOUND_WITH_MESSAGE, invalidRecipeSearchCriteriaException.getMessage()),
                             ErrorPayload.builder()
                                     .detail(invalidRecipeSearchCriteriaException.getDetail())
                                     .exception(invalidRecipeSearchCriteriaException)

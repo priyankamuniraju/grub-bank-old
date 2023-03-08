@@ -1,5 +1,6 @@
 package com.grubbank.apimodel;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.Recipe;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
+@JsonIgnoreProperties(ignoreUnknown = false)
 /*
  The Search criteria for searching {@link Recipe} in the datastore
  Currently it supports search by doing an AND query with each of the supplied params
