@@ -111,7 +111,7 @@ public class GrubBankCRUDController {
       logger.error(
           String.format(
               "Failed to update the recipe with recipe id : %s, exception %s",
-              recipeId, invalidRecipeException.getMessage()));
+              1, invalidRecipeException.getMessage()));
       return new ResponseEntity<>(
           new GrubBankResponseBody<>(
               String.format(
