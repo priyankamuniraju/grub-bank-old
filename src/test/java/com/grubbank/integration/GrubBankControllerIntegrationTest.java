@@ -2,9 +2,11 @@ package com.grubbank.integration;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grubbank.GrubbankApplication;
+import com.grubbank.apimodel.RecipeSearchCriteria;
 import com.grubbank.controller.GrubBankCRUDController;
 import com.grubbank.entity.Ingredient;
 import com.grubbank.entity.NutritionalValue;
@@ -13,9 +15,16 @@ import com.grubbank.model.TestInputGenerator;
 import com.grubbank.repository.IngredientRepository;
 import com.grubbank.repository.NutritionalValueRepository;
 import com.grubbank.repository.RecipeRepository;
+import com.grubbank.response.ErrorPayload;
 import com.grubbank.response.GrubBankResponseBody;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.stream.IntStream;
+
+import com.grubbank.validator.RecipeSearchCriteriaValidator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -195,13 +204,11 @@ public class GrubBankControllerIntegrationTest {
 
     IntStream.range(0, expectedIngredientSize)
         .forEach(
-            i -> {
-              Assertions.assertEquals(
-                  /*since we removed the first ingredient from original list,
-                  we need to match the i + 1 th entry on original list to
-                  the ith entry in the updated list*/
-                  inputIngredientList.get(i + 1).getName(), updatedIngredientList.get(i).getName());
-            });
+            i -> Assertions.assertEquals(
+                /*since we removed the first ingredient from original list,
+                we need to match the i + 1 th entry on original list to
+                the ith entry in the updated list*/
+                inputIngredientList.get(i + 1).getName(), updatedIngredientList.get(i).getName()));
   }
 
   @Test
@@ -258,5 +265,123 @@ public class GrubBankControllerIntegrationTest {
             jsonPath("$.message")
                 .value(
                     "Failed to delete the recipe with recipeId!! : 1900, exception No recipe found with recipe id : 1900 "));
+  }
+
+
+  private List<Recipe> saveAndFetchRecipes() throws Exception {
+    Recipe input = TestInputGenerator.createValidRecipe();
+    GrubBankResponseBody<Recipe> responseBody =
+            saveOrUpdateApiCall(
+                    objectMapper.writeValueAsString(input),
+                    "/grubbank/addRecipe",
+                    GrubBankCRUDController.RECIPE_ADD_SUCCESS);
+
+    Recipe recipeAddedOne = responseBody.getPayload();
+
+    //make a deep copy so that we can edit the recipe and use again to save
+    String recipeAddedOneStr = objectMapper.writeValueAsString(recipeAddedOne);
+    // read back
+    Recipe newRecipeToAdd = objectMapper.readValue(recipeAddedOneStr, Recipe.class);
+
+    newRecipeToAdd.setNumberOfServings(10);
+    newRecipeToAdd.setRecipeType(Recipe.RecipeType.NON_VEGETARIAN);
+    newRecipeToAdd.setName("Kip Burger");
+    newRecipeToAdd.setIngredientList(
+            List.of(Ingredient.builder().name("kip").build(),
+                    Ingredient.builder().name("wheat").build(),
+                    Ingredient.builder().name("lettuce").build()));
+
+    newRecipeToAdd.setPreparationTime(Duration.of(30, ChronoUnit.MINUTES));
+    // because this is a new recipe set id to 0
+    newRecipeToAdd.setId(0);
+    responseBody =
+            saveOrUpdateApiCall(
+                    objectMapper.writeValueAsString(newRecipeToAdd),
+                    "/grubbank/addRecipe",
+                    GrubBankCRUDController.RECIPE_ADD_SUCCESS);
+
+    Recipe recipeAddedTwo = responseBody.getPayload();
+
+    return List.of(recipeAddedOne, recipeAddedTwo);
+
+  }
+
+  @Test
+  public void addRecipesWithValidData_thenSearchWithCriteriaStatus400() throws Exception {
+
+    List<Recipe> savedRecipes = saveAndFetchRecipes();
+    // search with empty criteria, should return empty list
+    RecipeSearchCriteria recipeSearchCriteria = RecipeSearchCriteria.builder().build();
+    ResultActions resultActions = mockMvc
+            .perform(
+                    MockMvcRequestBuilders.post("/grubbank/search")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(recipeSearchCriteria)))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+
+    MvcResult result = resultActions.andReturn();
+    String responseStr = result.getResponse().getContentAsString();
+
+    TypeReference<GrubBankResponseBody<ErrorPayload>> typeToken = new TypeReference<>() {};
+    GrubBankResponseBody<ErrorPayload> listGrubBankResponseBody = objectMapper.readValue(responseStr, typeToken);
+    Assertions.assertEquals("No recipes found! Invalid RecipeSearchCriteria passed invalid field/s : ALL", listGrubBankResponseBody.getMessage());
+    Assertions.assertEquals("Empty or Invalid Recipe search criteria passed", listGrubBankResponseBody.getPayload().getDetail());
+
+    // check in DB the recipes are present
+    List<Recipe> recipeList = (List<Recipe>) recipeRepository.findAll();
+    Assertions.assertEquals(2, recipeList.size());
+    }
+
+    @Test
+    public void addRecipesWithValidData_thenSearchWithCriteriaStatus200() throws Exception {
+
+      List<Recipe> savedRecipes = saveAndFetchRecipes();
+      // Send a valid search criteria and verify the result
+      RecipeSearchCriteria recipeSearchCriteria = RecipeSearchCriteria.builder().build();
+      recipeSearchCriteria.setIngredientIncludeList(List.of(Ingredient.builder().name("milk").build()));
+      ResultActions resultActions = mockMvc
+              .perform(
+                      MockMvcRequestBuilders.post("/grubbank/search")
+                              .contentType(MediaType.APPLICATION_JSON)
+                              .content(objectMapper.writeValueAsString(recipeSearchCriteria)))
+              .andExpect(status().isOk())
+              .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+
+      MvcResult result = resultActions.andReturn();
+      String responseStr = result.getResponse().getContentAsString();
+
+      TypeReference<GrubBankResponseBody<List<Recipe>>> typeToken = new TypeReference<>() {};
+      GrubBankResponseBody<List<Recipe>> listGrubBankResponseBody = objectMapper.readValue(responseStr, typeToken);
+
+      List<Recipe> searchResult = listGrubBankResponseBody.getPayload();
+      Assertions.assertEquals(1, searchResult.size());
+      Assertions.assertEquals(savedRecipes.get(0), searchResult.get(0));
+    }
+
+  @Test
+  public void addRecipesWithValidData_thenSearchWithCriteria_excludeIngredeintsStatus200() throws Exception {
+
+    List<Recipe> savedRecipes = saveAndFetchRecipes();
+    // Send a valid search criteria and verify the result
+    RecipeSearchCriteria recipeSearchCriteria = RecipeSearchCriteria.builder().build();
+    recipeSearchCriteria.setIngredientExcludeList(List.of(Ingredient.builder().name("milk").build()));
+    ResultActions resultActions = mockMvc
+            .perform(
+                    MockMvcRequestBuilders.post("/grubbank/search")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(recipeSearchCriteria)))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+
+    MvcResult result = resultActions.andReturn();
+    String responseStr = result.getResponse().getContentAsString();
+
+    TypeReference<GrubBankResponseBody<List<Recipe>>> typeToken = new TypeReference<>() {};
+    GrubBankResponseBody<List<Recipe>> listGrubBankResponseBody = objectMapper.readValue(responseStr, typeToken);
+
+    List<Recipe> searchResult = listGrubBankResponseBody.getPayload();
+    Assertions.assertEquals(1, searchResult.size());
+    Assertions.assertEquals(savedRecipes.get(1), searchResult.get(0));
   }
 }

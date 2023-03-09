@@ -31,7 +31,7 @@ public class RecipeSearchCriteriaValidator {
     public InvalidRecipeSearchCriteriaException(InvalidField invalidField, String message) {
       super(
           String.format(
-              "Invalid ReciperSearchCriteria passed invalid field/s : %s", invalidField.name()));
+              "Invalid RecipeSearchCriteria passed invalid field/s : %s", invalidField.name()));
       this.invalidField = invalidField;
       this.detail = message;
     }
